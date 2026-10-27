@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="kk" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Массалар орталығын табу · №8 зертханалық жұмыс</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f9; --bg2:#e9edf4; --card:#ffffff; --ink:#0e1726; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --hot:#ef4d2e; --hot-soft:#fde5df; --cold:#2472ff; --cold-soft:#dde8ff;
+  --mix:#7c4dff; --mix-soft:#ece6ff; --exp:#0f9d58; --exp-soft:#dcf3e6; --warn:#d97706; --warn-soft:#fdf0d7;
+  --accent:#1d3fbb; --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);
+  --stage:#f8fafc; --glass:rgba(210,225,245,.35); --glassline:#64748b;
+  --radius:18px;
+}
+[data-theme="dark"]{
+  --bg:#0b1020; --bg2:#121a30; --card:#131b2e; --ink:#e7ecf5; --ink2:#c3cce0; --muted:#8b97b0; --line:#243049;
+  --hot:#ff6a4d; --hot-soft:#3a1d1a; --cold:#4d8dff; --cold-soft:#15254a;
+  --mix:#a58bff; --mix-soft:#241c45; --exp:#34c77b; --exp-soft:#11321f; --warn:#f0a53a; --warn-soft:#3a2a10;
+  --accent:#7ea0ff; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  --stage:#0f1628; --glass:rgba(120,150,200,.12); --glassline:#8b97b0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+a{color:var(--accent)}
+.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;background:radial-gradient(1200px 500px at 85% -10%,rgba(34,211,238,.35),transparent 60%),radial-gradient(900px 500px at 0% 120%,rgba(36,114,255,.45),transparent 60%),linear-gradient(135deg,#071a33,#0f3a6e 55%,#123b5a);color:#fff;padding:34px 20px 40px}
+.hero .wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.35fr 1fr;gap:28px;align-items:center}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+.kicker{display:inline-flex;gap:8px;flex-wrap:wrap}
+.kicker span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:4px 11px;border-radius:99px;font-size:.78rem;font-weight:600;letter-spacing:.02em}
+.hero h1{font-size:clamp(1.6rem,3.4vw,2.5rem);line-height:1.15;margin:14px 0 10px;font-weight:800;letter-spacing:-.02em}
+.hero p.sub{opacity:.85;margin:0 0 20px;max-width:620px}
+.hero .objective{margin:0 0 14px;max-width:760px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-left:4px solid #7fb0ff;font-size:.95rem;line-height:1.5}
+.hero .objective b{color:#bcd4ff}
+.hero .btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:10px 16px;font:600 .92rem Inter,sans-serif;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s,background .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:#fff;color:#1a2a6c}
+.btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.btn.solid{background:var(--accent);color:#fff}
+.btn.soft{background:var(--bg2);color:var(--ink)}
+.btn.small{padding:7px 12px;font-size:.84rem;border-radius:10px}
+.herocard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(8px);border-radius:20px;padding:18px}
+.herocard .row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.15)}
+.herocard .row:last-child{border:0}
+.herocard .lab{font-size:.85rem;opacity:.8}
+.herocard .num{font:700 1.35rem "JetBrains Mono",monospace}
+.herocard .tag{font-size:.7rem;font-weight:700;letter-spacing:.06em;background:rgba(165,139,255,.25);color:#d9ceff;padding:3px 8px;border-radius:6px}
+.eq{font:700 1.9rem "JetBrains Mono",monospace;text-align:center;margin:4px 0 10px;letter-spacing:.02em}
+.eq .h{color:#ff8a70}.eq .c{color:#7fb0ff}
+
+/* ---------- LAYOUT ---------- */
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:26px;padding:24px 18px 80px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.side{display:none}}
+.side nav{position:sticky;top:18px;display:flex;flex-direction:column;gap:2px;font-size:.88rem}
+.side a{color:var(--ink2);text-decoration:none;padding:7px 10px;border-radius:9px;display:flex;gap:9px;align-items:center;transition:background .15s}
+.side a:hover{background:var(--card)}
+.side a.on{background:var(--card);color:var(--accent);font-weight:700;box-shadow:var(--shadow)}
+.side a b{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:7px;background:var(--bg2);font-size:.72rem}
+.side a.on b{background:var(--accent);color:#fff}
+.side .tools{margin-top:14px;display:flex;gap:6px}
+.topnav{display:none;position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;padding:6px 10px}
+.topnav a{display:inline-block;padding:6px 10px;font-size:.82rem;color:var(--ink2);text-decoration:none;border-radius:8px}
+@media(max-width:1000px){.topnav{display:block}}
+
+section.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;margin:0 0 20px;box-shadow:var(--shadow);scroll-margin-top:70px}
+@media(max-width:600px){section.card{padding:18px 16px}}
+.sh{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+.sh .no{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--mix));color:#fff;font-weight:800;font-size:.95rem;flex:none}
+.sh h2{margin:0;font-size:1.28rem;letter-spacing:-.01em}
+.sh .crit{margin-left:auto;font-size:.74rem;font-weight:700;color:var(--muted);background:var(--bg2);padding:4px 9px;border-radius:99px;white-space:nowrap}
+h3{font-size:1rem;margin:18px 0 8px}
+p{margin:6px 0}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.lead{font-size:1.08rem;font-weight:600;border-left:4px solid var(--accent);padding:6px 0 6px 14px;margin:4px 0 12px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.76rem;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--bg2);color:var(--ink2)}
+.chip.hot{background:var(--hot-soft);color:var(--hot)}.chip.cold{background:var(--cold-soft);color:var(--cold)}
+.chip.mix{background:var(--mix-soft);color:var(--mix)}.chip.exp{background:var(--exp-soft);color:var(--exp)}.chip.warn{background:var(--warn-soft);color:var(--warn)}
+
+.crit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.crit-grid a{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);font-size:.88rem;transition:border-color .15s,transform .15s}
+.crit-grid a:hover{border-color:var(--accent);transform:translateY(-1px)}
+.crit-grid a i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--exp-soft);color:var(--exp);font-weight:800;font-size:.75rem;flex:none}
+
+.tasks{counter-reset:t;list-style:none;margin:8px 0;padding:0;display:grid;gap:8px}
+.tasks li{counter-increment:t;display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.tasks li::before{content:counter(t);flex:none;width:26px;height:26px;border-radius:8px;background:var(--bg2);display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.tasks li .chip{margin-left:auto;flex:none}
+
+.hyp{border-radius:16px;padding:16px 18px;background:linear-gradient(135deg,var(--warn-soft),transparent 70%);border:1px solid var(--line);font-size:1.02rem}
+.hyp .k{display:inline-block;font-weight:800;padding:0 7px;border-radius:6px;margin-right:2px}
+.hyp .k1{background:var(--cold-soft);color:var(--cold)}.hyp .k2{background:var(--hot-soft);color:var(--hot)}.hyp .k3{background:var(--mix-soft);color:var(--mix)}
+
+.formulas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:10px 0}
+.f{background:var(--bg2);border-radius:14px;padding:12px 14px}
+.f .t{font-size:.76rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+.f .e{font:700 1.08rem "JetBrains Mono",monospace}
+
+.vars{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:760px){.vars{grid-template-columns:1fr}}
+.var{border-radius:16px;padding:14px 16px;border:1px solid var(--line)}
+.var h4{margin:0 0 8px;font-size:.95rem;display:flex;gap:8px;align-items:center}
+.var ul{margin:0;padding-left:18px}.var li{margin:3px 0}
+.var.v1{background:linear-gradient(180deg,var(--cold-soft),transparent)}
+.var.v2{background:linear-gradient(180deg,var(--mix-soft),transparent)}
+.var.v3{background:linear-gradient(180deg,var(--bg2),transparent)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:860px){.two{grid-template-columns:1fr}}
+.inst{display:grid;gap:8px}
+.ins{border-radius:12px;background:var(--bg2);border:1px solid transparent;transition:border-color .15s}
+.ins.hl,.ins[open]{border-color:var(--accent)}
+.ins>summary{list-style:none;display:flex;gap:10px;align-items:center;padding:9px 12px;font-size:.92rem;font-weight:600;cursor:pointer;user-select:none}
+.ins>summary::-webkit-details-marker{display:none}
+.ins>summary b{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:.75rem;flex:none}
+.ins>summary span{flex:1}
+.ins>summary .chev{width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;margin:0 4px 4px 0;flex:none}
+.ins[open]>summary .chev{transform:rotate(225deg);margin:4px 4px 0 0}
+.insb{display:flex;gap:14px;padding:4px 12px 14px;align-items:flex-start;animation:insIn .25s ease}
+@keyframes insIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.insimg{flex:none;width:118px;height:118px;border-radius:14px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden;box-sizing:border-box}
+.insimg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.insimg svg{width:72px;height:72px}
+.insh{margin:0 0 6px;font-weight:700;font-size:.95rem}
+.insb ul{margin:0;padding-left:18px;font-size:.88rem;line-height:1.55}
+.insb li{margin:2px 0}
+.insb .sym{display:inline-block;vertical-align:middle}
+.insb .let{font:italic 700 1.15rem Georgia,'Times New Roman',serif}
+@media(max-width:520px){.insb{flex-direction:column}.insimg{width:100%;height:150px}}
+.scheme{background:var(--stage);border:1px solid var(--line);border-radius:16px;padding:6px}
+.scheme .lbl{cursor:pointer}
+.scheme .lbl circle{fill:var(--accent)}.scheme .lbl text{fill:#fff;font-weight:800;font-size:12px}
+
+.steps{list-style:none;margin:0;padding:0;position:relative}
+.steps li{position:relative;padding:0 0 14px 42px}
+.steps li::before{content:attr(data-n);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--card);border:2px solid var(--accent);color:var(--accent);font-weight:800;font-size:.8rem;display:grid;place-items:center}
+.steps li::after{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps li small{display:block;color:var(--muted)}
+
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:8px 0}
+.units div{border:1px dashed var(--line);border-radius:12px;padding:8px 12px;font-size:.9rem}
+.units b{font-family:"JetBrains Mono",monospace}
+
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.9rem}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+th,td{padding:8px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--bg2);font-weight:700;font-size:.82rem;position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+th.m,td.m{background:var(--mix-soft)}
+th.x,td.x{background:var(--exp-soft)}
+td input{width:74px;padding:6px 4px;border:1px solid var(--line);border-radius:8px;text-align:center;font:500 .9rem "JetBrains Mono",monospace;background:var(--card);color:var(--ink)}
+td input:focus{outline:2px solid var(--accent);border-color:transparent}
+td.calc{font-family:"JetBrains Mono",monospace;font-weight:600}
+.rowbtn{background:none;border:0;color:var(--muted);cursor:pointer;font-size:1.1rem}
+
+.safety{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;list-style:none;margin:0;padding:0}
+.safety li{display:flex;gap:12px;padding:12px 14px;border-radius:14px;background:var(--hot-soft);color:var(--ink);font-size:.92rem}
+.safety li svg{flex:none;width:26px;height:26px}
+
+/* ---------- MODEL ---------- */
+.lab{display:grid;grid-template-columns:320px 1fr;gap:18px}
+@media(max-width:980px){.lab{grid-template-columns:1fr}}
+.ctrls{display:grid;gap:10px;align-content:start}
+.ctrl{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--card)}
+.ctrl.h{border-left:4px solid var(--hot)}.ctrl.c{border-left:4px solid var(--cold)}.ctrl.r{border-left:4px solid var(--warn)}
+.ctrl .top{display:flex;justify-content:space-between;align-items:center;font-size:.86rem;font-weight:600;gap:8px}
+.ctrl .top input{width:70px;padding:3px 6px;border:1px solid var(--line);border-radius:8px;text-align:right;font:700 .9rem "JetBrains Mono",monospace;background:var(--bg2);color:var(--ink)}
+.ctrl .top .u{font-size:.78rem;color:var(--muted);margin-left:3px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:var(--bg2);margin:12px 0 4px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:4px solid var(--accent);cursor:pointer}
+.ctrl.h input[type=range]::-webkit-slider-thumb{border-color:var(--hot)}.ctrl.c input[type=range]::-webkit-slider-thumb{border-color:var(--cold)}.ctrl.r input[type=range]::-webkit-slider-thumb{border-color:var(--warn)}
+.ctrl.h input[type=range]::-moz-range-thumb{border-color:var(--hot)}.ctrl.c input[type=range]::-moz-range-thumb{border-color:var(--cold)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.88rem;font-weight:600;cursor:pointer}
+.switch input{display:none}
+.switch .tg{width:42px;height:24px;border-radius:99px;background:var(--bg2);position:relative;transition:background .2s;flex:none}
+.switch .tg::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.switch input:checked + .tg{background:var(--warn)}
+.switch input:checked + .tg::after{left:21px}
+.realbox{display:none;gap:10px}
+.realbox.on{display:grid}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+
+.stagecard{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--stage)}
+.stagebar{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:var(--card)}
+.stagebar .phase{font-weight:700;font-size:.9rem;margin-right:auto;min-width:0;flex:1 1 220px;display:flex;gap:8px;align-items:center}
+.stagebar .phase .dot{width:10px;height:10px;border-radius:50%;background:var(--mix);box-shadow:0 0 0 4px var(--mix-soft)}
+.play{width:40px;height:40px;border-radius:12px;border:0;background:var(--accent);color:#fff;cursor:pointer;display:grid;place-items:center}
+.seg{display:inline-flex;background:var(--bg2);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:5px 9px;border-radius:8px;font:600 .78rem Inter,sans-serif;color:var(--ink2);cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+canvas#stage{display:block;width:100%;height:auto;cursor:crosshair}
+.scrub{display:flex;align-items:center;gap:10px;padding:8px 14px 12px;background:var(--card);border-top:1px solid var(--line)}
+.scrub input{margin:0}
+.scrub .tm{font:600 .82rem "JetBrains Mono",monospace;color:var(--muted);min-width:70px;text-align:right}
+
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:760px){.readouts{grid-template-columns:repeat(2,1fr)}}
+.ro{border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:var(--card);position:relative;overflow:hidden}
+.ro .k{font-size:.76rem;color:var(--muted);font-weight:600}
+.ro .v{font:700 1.45rem "JetBrains Mono",monospace;letter-spacing:-.02em}
+.ro .s{font-size:.74rem;color:var(--muted)}
+.ro.mix .v{color:var(--mix)}.ro.hot .v{color:var(--hot)}.ro.cold .v{color:var(--cold)}
+.ro .badge{display:inline-block;margin-bottom:4px;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:5px;background:var(--mix-soft);color:var(--mix)}
+
+.panel{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:var(--card)}
+.panel h3{margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.chartwrap{position:relative}
+.chartwrap svg{width:100%;height:auto;display:block;overflow:visible}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg .axis{stroke:var(--muted);stroke-width:1.2}
+svg .tick{fill:var(--muted);font:500 11px Inter,sans-serif}
+svg .albl{fill:var(--ink2);font:600 12px Inter,sans-serif}
+svg text{font-family:Inter,sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--ink2);margin:4px 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:18px;height:3px;border-radius:2px;display:inline-block}
+.legend i.d{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important;height:2px}
+#tip{position:fixed;pointer-events:none;z-index:100;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:10px;font-size:.8rem;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .12s;white-space:nowrap}
+#tip b{font-family:"JetBrains Mono",monospace}
+
+.calc{display:grid;gap:8px}
+.cl{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--bg2);font:500 .92rem "JetBrains Mono",monospace;overflow-x:auto}
+.cl .n{font-family:Inter,sans-serif;font-weight:800;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.cl .r{font-weight:800}
+.cl.hot .r{color:var(--hot)}.cl.cold .r{color:var(--cold)}.cl.mix .r{color:var(--mix)}
+
+.ebars{display:grid;gap:12px;margin-top:6px}
+.ebar .lab{display:flex;justify-content:space-between;font-size:.84rem;font-weight:600;margin-bottom:4px}
+.ebar .track{height:30px;border-radius:9px;background:var(--bg2);display:flex;overflow:hidden}
+.ebar .seg2{height:100%;transition:width .45s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;padding-left:8px;font:700 .74rem "JetBrains Mono",monospace;color:#fff;white-space:nowrap;overflow:hidden}
+.balance{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.9rem}
+.pill{display:inline-block;white-space:nowrap;padding:3px 10px;border-radius:99px;font-weight:800;font-size:.82rem}
+.pill.ok{background:var(--exp-soft);color:var(--exp)}.pill.mid{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--hot-soft);color:var(--hot)}
+
+.selrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.85rem;margin-bottom:6px}
+select{padding:6px 10px;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 .84rem Inter,sans-serif}
+.hypcheck{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--mix-soft);font-size:.9rem}
+
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.cmp{grid-template-columns:1fr}}
+.cmpcol{border-radius:16px;padding:14px 16px;border:2px solid}
+.cmpcol.m{border-color:var(--mix);background:linear-gradient(180deg,var(--mix-soft),transparent 60%)}
+.cmpcol.x{border-color:var(--exp);background:linear-gradient(180deg,var(--exp-soft),transparent 60%)}
+.cmpcol h3{margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.cmpcol ul{margin:6px 0 0;padding-left:18px;font-size:.9rem}
+.verdict{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--bg2);font-size:.92rem}
+
+textarea{width:100%;min-height:84px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;background:var(--card);color:var(--ink);resize:vertical}
+textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+
+main,.lab>*,.two>*,.cmp>*,.vars>*{min-width:0}
+footer{text-align:center;color:var(--muted);font-size:.84rem;padding:10px 0 40px}
+
+/* ---------- language switch & low vision ---------- */
+.toptools{position:absolute;top:16px;right:20px;display:flex;gap:8px;align-items:center;z-index:3}
+@media(max-width:760px){.toptools{position:static;margin:0 0 12px;flex-wrap:wrap}}
+.langsw{display:inline-flex;border:1px solid rgba(255,255,255,.45);border-radius:10px;overflow:hidden}
+.langsw button{background:transparent;color:#fff;border:0;padding:6px 10px;font:700 .8rem Inter,sans-serif;cursor:pointer}
+.langsw button:hover{background:rgba(255,255,255,.15)}
+.langsw button.on{background:#fff;color:#1a2a6c}
+.a11yon{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1a2a6c;border:0;border-radius:10px;font:700 .8rem Inter,sans-serif;padding:7px 12px;cursor:pointer}
+.a11ybar{position:fixed;top:0;left:0;right:0;z-index:200;background:#fff;color:#000;border-bottom:3px solid #000;font-family:Arial,sans-serif}
+.a11yrow{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;padding:8px 10px}
+.a11ybar .grp{display:flex;gap:5px}
+.a11ybar button{background:#fff;color:#000;border:2px solid #000;border-radius:5px;min-width:40px;height:40px;padding:0 8px;font:700 16px Arial,sans-serif;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.a11ybar button.on{outline:3px solid #1f6feb;outline-offset:1px}
+.a11ybar .fsb0{font-size:15px}.a11ybar .fsb1{font-size:20px}.a11ybar .fsb2{font-size:25px}
+.a11ybar .csb1{background:#000;color:#fff}.a11ybar .csb2{background:#000;color:#ffeb3b}.a11ybar .csb3{background:#9dd1ff;color:#063462}
+.a11ypanel{max-width:720px;margin:0 auto;border-top:1px solid #000;padding:12px 16px}
+.a11ypanel .arow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0;font-size:16px}
+.a11ypanel .arow span{min-width:260px}
+.a11ypanel .serif{font-family:Georgia,'Times New Roman',serif!important}
+.a11ypanel .afoot{display:flex;justify-content:space-between;border-top:1px solid #000;padding-top:12px;margin-top:12px}
+html.a11y-on body{padding-top:var(--a11yh,60px)}
+html.a11y-on.fs-0{font-size:19px} html.a11y-on.fs-0 body{font-size:19px}
+html.a11y-on.fs-1{font-size:23px} html.a11y-on.fs-1 body{font-size:23px}
+html.a11y-on.fs-2{font-size:27px} html.a11y-on.fs-2 body{font-size:27px}
+html.a11y-on main button, html.a11y-on main select, html.a11y-on main input, html.a11y-on main textarea, html.a11y-on main td, html.a11y-on main th{font-size:.9rem!important}
+html.a11y-on main{overflow-wrap:break-word}
+html.a11y-on.cs-0{--fg:#000;--bgc:#fff}
+html.a11y-on.cs-1{--fg:#fff;--bgc:#000}
+html.a11y-on.cs-2{--fg:#ffeb3b;--bgc:#000}
+html.a11y-on.cs-3{--fg:#063462;--bgc:#9dd1ff}
+html.a11y-on{--ink:var(--fg);--ink2:var(--fg);--muted:var(--fg);--line:var(--fg);--card:var(--bgc);--bg:var(--bgc);--bg2:var(--bgc);--stage:var(--bgc);--accent:var(--fg);--shadow:none}
+html.a11y-on body, html.a11y-on .hero, html.a11y-on .layout, html.a11y-on .layout *:not(svg):not(svg *):not(.frac):not(i):not(.thermimg), html.a11y-on .hero *:not(svg):not(svg *){background:var(--bgc)!important;color:var(--fg)!important;border-color:var(--fg)!important;box-shadow:none!important}
+html.a11y-on .layout svg text{fill:var(--fg)!important}
+html.a11y-on .layout svg .grid{stroke:var(--fg)!important;opacity:.35}
+html.a11y-on .layout svg .axis{stroke:var(--fg)!important}
+html.a11y-on .layout .frac>span:first-child{border-bottom-color:var(--fg)!important}
+html.a11y-on .hero .langsw button,html.a11y-on .hero .a11yon{border:2px solid var(--fg)!important}
+html.a11y-on .langsw button.on{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:3px}
+html.a11y-on .ctrl .top input{width:4.6em!important}
+html.a11y-on.noimg .layout img{display:none!important}
+html.a11y-on.ff-0 body *:not(.a11ybar *){font-family:Arial,Helvetica,sans-serif!important}
+html.a11y-on.ff-1 body *:not(.a11ybar *){font-family:Georgia,'Times New Roman',serif!important}
+html.a11y-on.ls-1 .layout *, html.a11y-on.ls-1 .hero *{letter-spacing:.06em!important}
+html.a11y-on.ls-2 .layout *, html.a11y-on.ls-2 .hero *{letter-spacing:.12em!important}
+html.a11y-on.lh-1 .layout *, html.a11y-on.lh-1 .hero *{line-height:2!important}
+html.a11y-on.lh-2 .layout *, html.a11y-on.lh-2 .hero *{line-height:2.6!important}
+html.a11y-on .side{top:calc(var(--a11yh,60px) + 10px)}
+html.a11y-on .layout input[type=range]{background:var(--fg)!important;height:4px}
+
+/* ---------- lab 7 additions ---------- */
+
+.vcta{display:flex;align-items:center;gap:18px;margin:0 0 20px;padding:20px 22px;border-radius:var(--radius);color:#fff;background:radial-gradient(700px 300px at 90% -20%,rgba(34,211,238,.35),transparent 60%),linear-gradient(135deg,#071a33,#0f3a6e 60%,#123b5a);box-shadow:var(--shadow)}
+.vcta-ic{flex:none;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.14)}
+.vcta-tx{flex:1;min-width:0}.vcta-tx h3{margin:0 0 4px;font-size:1.1rem}.vcta-tx p{margin:0;opacity:.85;font-size:.92rem}
+.vcta-btn{flex:none;background:#fff!important;color:#1a2a6c!important;text-decoration:none}
+@media(max-width:700px){.vcta{flex-direction:column;align-items:flex-start}}
+
+.crit-grid a i{width:32px;height:32px;border-radius:10px;background:var(--cold-soft);color:var(--accent)}
+.crit-grid a:hover i{background:var(--accent);color:#fff}
+.thermbox{display:flex;gap:24px;align-items:center;margin-top:16px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.thermfig{margin:0;flex:none}
+.thermimg{height:340px;width:auto;border-radius:10px;display:block}
+.thermtext{flex:1;min-width:0}
+.thermtext .f{margin:8px 0}
+@media(max-width:700px){.thermbox{flex-direction:column}.thermimg{height:260px}}
+
+.side{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow-y:auto}
+.side nav{position:static!important}
+.hero .wrap{grid-template-columns:1fr}
+th.st,td.st{background:var(--warn-soft)}
+td.st input{width:92px}
+td input.good{border-color:var(--exp);background:var(--exp-soft);color:var(--exp);font-weight:700}
+td input.bad{border-color:var(--hot);background:var(--hot-soft);color:var(--hot);font-weight:700}
+.chkbtn{background:var(--accent);color:#fff;padding:9px 24px}
+.okc{color:var(--exp);font-weight:700}.midc{color:var(--warn);font-weight:700}.badc{color:var(--hot);font-weight:700}
+.tblblock{margin-top:18px}
+.tblblock>h3:first-child{margin-top:0}
+
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.15;margin:0 .12em;font-size:.9em}
+.frac>span{padding:0 .2em}
+.frac>span:first-child{border-bottom:1.5px solid currentColor}
+.metarow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px}
+@media(max-width:700px){.metarow{grid-template-columns:1fr}}
+.metarow label{display:block;font-size:.76rem;color:var(--muted);font-weight:600;margin-bottom:3px}
+.metarow input,.prefs input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:500 .9rem Inter,sans-serif}
+.metarow input:focus,.prefs input:focus{outline:2px solid var(--accent);border-color:transparent}
+.prefs{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 10px}
+.prefs div{min-width:170px}
+.prefs label{display:block;font-size:.76rem;color:var(--muted);font-weight:600;margin-bottom:3px}
+.prefs input{font-family:"JetBrains Mono",monospace}
+.side .tools{flex-direction:column}
+.side .tools .btn{justify-content:center}
+td.cv{font-family:"JetBrains Mono",monospace;font-weight:600}
+td.dev-ok{color:var(--exp);font-weight:700}
+td.dev-bad{color:var(--hot);font-weight:700}
+.warnline{display:none;margin-top:6px;font-size:.8rem;font-weight:600;color:var(--hot)}
+.warnline.on{display:block}
+#stage{display:block;width:100%;height:auto;background:var(--stage)}
+#stage .wire{fill:none;stroke:var(--ink2);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+#stage .sym{fill:var(--card);stroke:var(--ink);stroke-width:3}
+#stage .lt{fill:var(--ink);font:800 26px Inter,sans-serif}
+#stage .rd{fill:var(--cold);font:700 18px "JetBrains Mono",monospace}
+#stage .tn{fill:var(--muted);font:600 14px Inter,sans-serif}
+#stage .chg{fill:var(--warn)}
+#stage .chg.v{fill:var(--exp)}
+#stage .dial{fill:var(--card);stroke:var(--line);stroke-width:2}
+#stage .scale{fill:none;stroke:var(--ink2);stroke-width:2}
+#stage .tk{stroke:var(--ink2);stroke-width:2}
+#stage .tkl{fill:var(--muted);font:600 12px "JetBrains Mono",monospace}
+#stage .needle{stroke:var(--hot);stroke-width:3.5;stroke-linecap:round;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+#stage .dl{fill:var(--ink);font:800 22px Inter,sans-serif}
+#stage .dv{fill:var(--ink);font:700 17px "JetBrains Mono",monospace}
+#stage .swbox{fill:var(--card);stroke:var(--line);stroke-width:2}
+#stage .swt{fill:var(--ink);font:700 34px "JetBrains Mono",monospace}
+#stage #keyHit{cursor:pointer}
+.odo{display:flex;gap:3px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 4px}
+.odo span{font:700 1.1rem "JetBrains Mono",monospace;width:24px;height:34px;display:grid;place-items:center;background:var(--ink);color:var(--bg);border-radius:6px}
+.odo span.dec{background:var(--warn);color:#fff}
+.odo span.sep{background:none;color:var(--muted);width:8px}
+.odo em{font-style:normal;font-size:.8rem;color:var(--muted);margin-left:6px;align-self:center}
+.bill{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg2);margin-top:10px;font-size:.9rem}
+.bill b{font-family:"JetBrains Mono",monospace;color:var(--warn)}
+.qa{display:grid;gap:14px}
+.qa label{display:block;font-weight:700;margin-bottom:6px;font-size:.95rem}
+.refl{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:760px){.refl{grid-template-columns:1fr}}
+.refl label{display:block;font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:4px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:.88rem;opacity:0;pointer-events:none;transition:.25s;z-index:120}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ---------- lab 6 additions ---------- */
+:root{--water:#38bdf8;--water2:#0284c7;--waterfill:rgba(56,189,248,.35)}
+[data-theme="dark"]{--water:#38bdf8;--water2:#7dd3fc;--waterfill:rgba(56,189,248,.28)}
+.vars.v4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1100px){.vars.v4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.vars.v4{grid-template-columns:1fr}}
+.var.v0{background:linear-gradient(180deg,var(--warn-soft),transparent)}
+.var p.how{margin:10px 0 0;font-size:.82rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.qlist{counter-reset:q;list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.qlist li{counter-increment:q;display:flex;gap:12px;align-items:flex-start;font-size:1.04rem;font-weight:600;border-left:4px solid var(--accent);padding:6px 0 6px 14px}
+.qlist li::before{content:counter(q);flex:none;width:28px;height:28px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.85rem}
+.ftable td,.ftable th{white-space:normal;text-align:left;vertical-align:top}
+.ftable td:first-child{font:700 1rem "JetBrains Mono",monospace;white-space:nowrap;color:var(--accent)}
+.consts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px}
+.consts>div{border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+.consts h4{margin:0 0 6px;font-size:.88rem}
+.consts .agree{background:var(--exp-soft);border-color:transparent}
+.figs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+@media(max-width:760px){.figs{grid-template-columns:1fr}}
+.figbox{display:flex;gap:16px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.figbox svg.dev{flex:none;width:110px;height:auto}
+.figbox h3{margin:0 0 6px}
+@media(max-width:480px){.figbox{flex-direction:column}}
+#stage .vessel{fill:none;stroke:var(--ink2);stroke-width:3;stroke-linejoin:round}
+#stage .water{fill:var(--waterfill)}
+#stage .wline{stroke:var(--water2);stroke-width:2}
+#stage .stand{fill:none;stroke:var(--muted);stroke-width:6;stroke-linecap:round}
+#stage .dyn{fill:var(--card);stroke:var(--ink);stroke-width:2.5}
+#stage .spring{fill:none;stroke:var(--ink2);stroke-width:2.2}
+#stage .thread{stroke:var(--ink2);stroke-width:1.6}
+#stage .body{stroke:var(--ink);stroke-width:2.5}
+#stage .dtk{stroke:var(--ink2);stroke-width:1.3}
+#stage .dtl{fill:var(--muted);font:600 11px "JetBrains Mono",monospace}
+#stage .ptr{fill:var(--hot)}
+#stage .scalebox{fill:#0e1726}
+#stage .scaledsp{fill:#7dffb0;font:700 20px "JetBrains Mono",monospace}
+#stage .tn2{fill:var(--muted);font:600 13px Inter,sans-serif}
+#stage .rd2{fill:var(--cold);font:700 17px "JetBrains Mono",monospace}
+.bodysel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bodysel button{border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:12px;padding:8px 6px;font:600 .82rem Inter,sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bodysel button svg{width:30px;height:30px}
+.bodysel button.on{border-color:var(--accent);color:var(--accent);background:var(--cold-soft)}
+.bodysel.six{grid-template-columns:repeat(6,1fr)}
+@media(max-width:700px){.bodysel.six{grid-template-columns:repeat(3,1fr)}}
+.bform{margin-top:8px;padding:7px 10px;border-radius:10px;background:var(--bg2);font:700 .9rem "JetBrains Mono",monospace;color:var(--accent);text-align:center}
+.bform small{display:block;font:500 .76rem Inter,sans-serif;color:var(--muted);margin-top:2px}
+.presets .btn{border:1px solid transparent}
+.presets .btn.on{border-color:var(--accent);color:var(--accent);background:var(--cold-soft);box-shadow:0 0 0 1px var(--accent)}
+.presets.planets .btn{flex-direction:column;gap:0;line-height:1.15;padding:5px 9px}
+.presets.planets .btn small{font:600 .7rem "JetBrains Mono",monospace;opacity:.75}
+.ctrl.g{border-left:4px solid var(--exp)}
+.ctrl.g input[type=range]::-webkit-slider-thumb{border-color:var(--exp)}.ctrl.g input[type=range]::-moz-range-thumb{border-color:var(--exp)}
+.tblsel{display:flex;flex-direction:column;gap:6px;margin:14px 0 4px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+.tblsel>span{font-weight:700;font-size:.88rem}
+td input.sm{width:62px}
+td .pair{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:nowrap}
+td .pair label{font:600 .8rem "JetBrains Mono",monospace;color:var(--muted)}
+tr.avg td{background:var(--bg2);font-weight:700}
+td.bn{text-align:left;vertical-align:middle;background:var(--card);border-right:1px solid var(--line)}
+td.vd{white-space:normal;min-width:120px}
+.score{display:inline-flex;align-items:center;gap:8px;margin-left:8px;font-weight:700;font-size:.9rem}
+.radios{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.radios button{border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:99px;padding:7px 14px;font:600 .88rem Inter,sans-serif;cursor:pointer}
+.radios button.on[data-v="yes"]{background:var(--exp-soft);border-color:var(--exp);color:var(--exp)}
+.radios button.on[data-v="part"]{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.radios button.on[data-v="no"]{background:var(--hot-soft);border-color:var(--hot);color:var(--hot)}
+.selfcheck{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.selfcheck label{display:flex;gap:12px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-size:.95rem;transition:border-color .15s,background .15s}
+.selfcheck input{width:20px;height:20px;accent-color:var(--exp);flex:none}
+.selfcheck label:has(input:checked){border-color:var(--exp);background:var(--exp-soft)}
+.progress{height:10px;border-radius:99px;background:var(--bg2);overflow:hidden;margin:12px 0 4px}
+.progress i{display:block;height:100%;background:var(--exp);transition:width .3s}
+.tcd{display:grid;gap:10px}
+.tcd label{display:block;font-weight:700;font-size:.9rem;margin-bottom:4px}
+.tcd label small{font-weight:500;color:var(--muted)}
+.hint{font-size:.84rem;color:var(--muted);margin:2px 0 8px}
+.ex-note{border-radius:12px;background:var(--cold-soft);padding:10px 12px;font-size:.88rem;margin:10px 0}
+@media print{.radios button:not(.on){display:none}}
+.cl.exp .r{color:var(--exp)}
+.var h4{flex-wrap:wrap}
+.figbox .f .e{font-size:.95rem}
+.tasks li>span:first-child{flex:1}
+.cl .n{text-transform:none}
+@media(max-width:600px){.ftable td:first-child{white-space:normal;font-size:.85rem;min-width:110px}.ftable td,.ftable th{white-space:normal!important}}
+.lb{position:fixed;inset:0;z-index:300;background:#0b0f17;display:flex;flex-direction:column}
+.lb[hidden]{display:none}
+.lbtools{display:flex;justify-content:center;align-items:center;gap:8px;padding:10px}
+.lbtools button{background:#fff;color:#000;border:0;border-radius:8px;min-width:42px;height:42px;font:700 20px Arial,sans-serif;cursor:pointer}
+.lbtools span{color:#fff;font:600 15px Arial,sans-serif;min-width:56px;text-align:center}
+.lbstage{flex:1;overflow:hidden;position:relative;cursor:grab;touch-action:none}
+.lbstage.drag{cursor:grabbing}
+.lbstage img{position:absolute;left:50%;top:50%;transform-origin:0 0;user-select:none;-webkit-user-drag:none;max-width:none}
+.lbhint{color:#cfd6e4;text-align:center;font:14px Arial,sans-serif;padding:8px 10px 14px}
+.devimg{height:300px;width:auto;border-radius:10px;display:block;cursor:zoom-in;background:#fff;border:1px solid var(--line)}
+.thermfig{margin:0;flex:none;text-align:center}.thermfig figcaption{font-size:.78rem;color:var(--muted);margin-top:6px}
+@media(max-width:480px){.devimg{height:240px}}
+.tsub{display:flex;gap:10px;align-items:center;margin:10px 0 6px}
+td.cv.m{background:var(--mix-soft)}
+
+</style>
+<style>
+.cb{fill:#d9bf8f;stroke:#8a6d3b;stroke-width:.8}.hole{fill:var(--card);stroke:var(--ink);stroke-width:.6}
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.ic{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.ic .ph{aspect-ratio:16/11;background:var(--bg2)}.ic .ph svg,.ic .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ic .tx{padding:8px 11px;font-size:.84rem}.ic .tx b{display:block}.ic label{cursor:pointer;color:var(--accent);font-size:.78rem;font-weight:700}
+.qz{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 12px;background:var(--card)}
+.qo{display:flex;gap:8px;align-items:center;padding:6px 9px;border-radius:9px;cursor:pointer}.qo:hover{background:var(--bg2)}
+.qo.right{background:var(--exp-soft)}.qo.wrong{background:var(--hot-soft)}.qe{font-size:.86rem;margin:6px 0;color:var(--ink2)}
+.qz textarea{margin-top:8px}.ln0{stroke:var(--hot)}.ln1{stroke:var(--cold)}.ln2{stroke:var(--exp)}
+#tilt{transition:transform .5s}.pcl{touch-action:none;cursor:crosshair}
+</style></head>
+<body>
+<div id="tip"></div>
+<div id="lb" class="lb" hidden>
+  <div class="lbtools">
+    <button type="button" id="lbOut" title="Кішірейту">−</button>
+    <span id="lbPct">100%</span>
+    <button type="button" id="lbIn" title="Үлкейту">+</button>
+    <button type="button" id="lbFit" title="Бастапқы өлшем">⤢</button>
+    <button type="button" id="lbClose" title="Жабу">✕</button>
+  </div>
+  <div class="lbstage" id="lbStage"><img id="lbImg" alt=""></div>
+  <div class="lbhint">Суретті тышқан дөңгелегімен немесе екі саусақпен үлкейтуге, сүйреп жылжытуға болады</div>
+</div>
+
+<div id="a11yBar" class="a11ybar" hidden>
+  <div class="a11yrow">
+    <div class="grp" title="Қаріп өлшемі"><button type="button" data-fs="0" class="fsb0">A</button><button type="button" data-fs="1" class="fsb1">A</button><button type="button" data-fs="2" class="fsb2">A</button></div>
+    <div class="grp" title="Түс схемасы"><button type="button" data-cs="0" class="csb0" title="Ақ фонда қара мәтін">Aa</button><button type="button" data-cs="1" class="csb1" title="Қара фонда ақ мәтін">Aa</button><button type="button" data-cs="2" class="csb2" title="Қара фонда сары мәтін">Aa</button><button type="button" data-cs="3" class="csb3" title="Көк фонда қою көк мәтін">Aa</button></div>
+    <div class="grp"><button type="button" id="a11ySet" title="Баптаулар"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button><button type="button" id="a11yOff" title="Кәдімгі нұсқаға қайту"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+  </div>
+  <div id="a11yPanel" class="a11ypanel" hidden>
+    <div class="arow"><span>Суреттер:</span><button type="button" id="a11yImg" title="Суреттерді көрсету / жасыру"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button></div>
+    <div class="arow"><span>Қаріп түрі:</span><button type="button" data-ff="0">Засечкасыз</button><button type="button" data-ff="1" class="serif">Засечкалы</button></div>
+    <div class="arow"><span>Әріптер арасындағы аралық (кернинг):</span><button type="button" data-ls="0">Стандарт</button><button type="button" data-ls="1">Орташа</button><button type="button" data-ls="2">Үлкен</button></div>
+    <div class="arow"><span>Жолдар арасындағы аралық:</span><button type="button" data-lh="0">Стандарт аралық</button><button type="button" data-lh="1">Бір жарым аралық</button><button type="button" data-lh="2">Қос аралық</button></div>
+    <div class="afoot"><button type="button" id="a11yReset">Әдепкі параметрлер</button><button type="button" id="a11yClose">Жабу</button></div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="tb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eadfca"/><stop offset="1" stop-color="#d3bf9d"/></linearGradient>
+<linearGradient id="mt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".45" stop-color="#aab3bd"/><stop offset="1" stop-color="#6b7480"/></linearGradient>
+<linearGradient id="wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a066"/><stop offset="1" stop-color="#8a5a2b"/></linearGradient>
+<linearGradient id="cg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8bb86"/><stop offset="1" stop-color="#b8975f"/></linearGradient>
+<filter id="sh"><feGaussianBlur stdDeviation="2.2"/></filter></defs></svg>
+<header class="hero">
+  <div class="toptools"><button type="button" id="a11yOn" class="a11yon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Нашар көретіндерге</span></button></div>
+  <div class="wrap"><div>
+    <div class="kicker"><span>Физика</span><span>№8 зертханалық жұмыс</span><span>Зерттеуге негізделген оқыту</span></div>
+    <h1>Жазық фигураның массалар орталығын табу</h1>
+    <div class="objective"><b>Оқу мақсаты:</b> <span>7.2.4.3 – жазық фигураның массалар орталығының орнын эксперименттік анықтау</span></div>
+    <p class="sub">Интерактивті модельде сол қолдың контурын қиып, фигураны үш тесігі арқылы іліп, ауырлық күшінің вертикаль сызықтарын жүргізіп, массалар орталығын табасыз, содан кейін оны қарындаш ұшымен тексересіз.</p>
+    <div class="btns"><a class="btn primary" href="#s9m">Модельді ашу</a><button class="btn ghost" id="themeBtn" type="button">Түн / күн</button></div>
+  </div></div>
+</header>
+<nav class="topnav" id="topnav"></nav>
+<div class="layout">
+<aside class="side"><nav id="sidenav"></nav><div class="tools" style="margin-top:14px;display:flex;gap:6px"><button class="btn solid small" id="saveHtml" type="button">HTML сақтау</button></div></aside>
+<main>
+
+<section class="card" id="s1" data-title="Жұмыс туралы" data-no="1">
+  <div class="sh"><div class="no">1</div><h2>№8 зертханалық жұмыс: бөлімдер картасы</h2></div>
+  <div class="metarow">
+    <div><label for="m-names">Аты-жөні</label><input type="text" id="m-names" data-save placeholder="Аты-жөні"></div>
+    <div><label for="m-class">Сынып</label><input type="text" id="m-class" data-save placeholder="Сынып"></div>
+    <div><label for="m-date">Күні</label><input type="date" id="m-date" data-save></div>
+  </div>
+  <p class="muted small">Жұмыс парағының әр бөлімі осы бетте бар. Сол жақтағы мәзірден керек бөлімге өтесіз.</p>
+</section>
+
+<section class="card" id="s2" data-title="Зерттеу сұрақтары" data-no="2">
+  <div class="sh"><div class="no">2</div><h2>Зерттеу сұрақтары</h2></div>
+  <ol class="qlist">
+    <li>Фигураны әртүрлі тесігінен ілу арқылы жіп бойымен сызылған сызықтар қай жерде қиылысады? Сол нүкте фигураның массалар орталығы бола ма?</li>
+  </ol>
+  <div class="chips" style="margin-top:12px"><span class="chip cold">Өзгертеміз: ілу нүктесі</span><span class="chip exp">Өлшейміз: m, O мен N координаталары</span><span class="chip mix">Есептейміз: күш иіні d, M</span></div>
+</section>
+
+<section class="card" id="s3" data-title="Мақсат және міндеттер" data-no="3">
+  <div class="sh"><div class="no">3</div><h2>Мақсат және міндеттер</h2></div>
+  <p><b>Мақсат:</b> қатырма қағаздан жасалған жазық фигураның массалар орталығын тәжірибеде табу және оның дұрыстығын тексеру.</p>
+  <ol class="tasks">
+    <li><span>Фигура жасап, үш тесік тесу; әр тесік арқылы іліп, вертикаль сызық жүргізу.</span> <span class="chip exp">Тәжірибе</span></li>
+    <li><span>Сызықтардың қиылысу нүктесі O-ны тауып, координаталарын өлшеу.</span> <span class="chip exp">Өлшеу</span></li>
+    <li><span>O нүктесін қарындаш ұшы арқылы тексеру.</span> <span class="chip warn">Тексеру</span></li>
+  </ol>
+</section>
+
+<section class="card" id="s4" data-title="Болжам" data-no="4">
+  <div class="sh"><div class="no">4</div><h2>Болжам</h2></div>
+  <div class="hyp"><span class="k k1">Егер</span> фигураны үш түрлі тесігінен іліп, әр жолы тік сызық жүргізсек, <span class="k k2">онда</span> үш сызық бір нүктеде қиылысады, ал сол нүкте – массалар орталығы.</div>
+</section>
+
+<section class="card" id="s5" data-title="Зерттеу айнымалылары" data-no="5">
+  <div class="sh"><div class="no">5</div><h2>Зерттеу айнымалылары</h2></div>
+  <div class="vars">
+    <div class="var v1"><h4><span class="chip cold">Тәуелсіз</span> өзгертеміз</h4><ul><li>ілу нүктесі</li></ul></div>
+    <div class="var v2"><h4><span class="chip mix">Тәуелді</span> өлшейміз</h4><ul><li>жіптің бағыты бойынша сызылған тік сызықтың орны мен бағыты, сондай-ақ сызықтардың қиылысу нүктесі</li></ul></div>
+    <div class="var v3"><h4><span class="chip">Бақыланатын шамалар</span> өзгертпейміз</h4><ul><li>фигураның пішіні мен өлшемі</li><li>жіп пен жүк</li></ul></div>
+  </div>
+</section>
+
+<section class="card" id="s6" data-title="Құралдар мен жабдықтар" data-no="6">
+  <div class="sh"><div class="no">6</div><h2>Құралдар мен жабдықтар</h2></div>
+  <p class="small muted">Суреттер шынайы құралдардың көрінісі. Өз сыныбыңыздағы құралдың фотосы болса, «Өз фотоңызды қою» арқылы ауыстыруға болады.</p>
+  <div class="ig" id="instList"><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="82" cy="94" rx="54" ry="6" fill="#0005" filter="url(#sh)"/><path d="M28 22L126 16L132 86L32 92Z" fill="url(#cg)" stroke="#8a6d3b"/><path d="M126 16L132 86L113 84Z" fill="#c9ab76"/><path d="M34 30L120 25" stroke="#fff6" stroke-width="2"/></svg></div><div class="tx"><b>1. Қатырма қағаз</b>Фигура жасауға арналған тығыз қағаз (А4 бөлігі).<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="92" rx="50" ry="6" fill="#0005" filter="url(#sh)"/><path d="M78 56L122 12L127 17L88 62Z" fill="url(#mt)" stroke="#555" stroke-width=".8"/><path d="M82 60L38 14L33 19L72 64Z" fill="url(#mt)" stroke="#555" stroke-width=".8"/><ellipse cx="62" cy="84" rx="17" ry="11" fill="none" stroke="#c62828" stroke-width="7" transform="rotate(-25 62 84)"/><ellipse cx="100" cy="84" rx="17" ry="11" fill="none" stroke="#c62828" stroke-width="7" transform="rotate(25 100 84)"/><circle cx="80" cy="60" r="3" fill="#333"/></svg></div><div class="tx"><b>2. Қайшы</b>Фигураны қию үшін. Ұшын өзіңе қаратпа!<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="60" cy="98" rx="42" ry="6" fill="#0005" filter="url(#sh)"/><rect x="20" y="92" width="76" height="9" rx="3" fill="url(#mt)" stroke="#555" stroke-width=".7"/><rect x="52" y="12" width="6" height="82" fill="url(#mt)" stroke="#555" stroke-width=".7"/><rect x="52" y="16" width="78" height="5" fill="url(#mt)" stroke="#555" stroke-width=".7"/><rect x="47" y="42" width="16" height="11" rx="2" fill="#444"/><circle cx="126" cy="26" r="3.2" fill="#222"/></svg></div><div class="tx"><b>3. Штатив (аспа)</b>Фигураны іліп қоюға арналған тұрақты тірек.<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="70" rx="56" ry="6" fill="#0005" filter="url(#sh)"/><rect x="18" y="45" width="48" height="19" rx="9" fill="url(#wd)" stroke="#5a3a18"/><path d="M66 51L144 54L66 58Z" fill="url(#mt)" stroke="#555" stroke-width=".7"/><path d="M24 50H60" stroke="#fff6" stroke-width="2"/></svg></div><div class="tx"><b>4. Біз (шеге)</b>Қатырма қағазда тесік тесуге. Қатты тақтайшаның үстінде тесеміз.<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="96" rx="40" ry="6" fill="#0005" filter="url(#sh)"/><rect x="48" y="28" width="64" height="56" rx="4" fill="#2f6fb5"/><path d="M48 40H112M48 52H112M48 64H112M48 76H112" stroke="#1d4f86" stroke-width="2"/><ellipse cx="80" cy="28" rx="36" ry="6" fill="url(#wd)"/><ellipse cx="80" cy="84" rx="36" ry="6" fill="url(#wd)"/><path d="M112 70C130 80 140 92 120 98C100 104 70 98 50 100" fill="none" stroke="#2f6fb5" stroke-width="2.4"/></svg></div><div class="tx"><b>5. Жіп</b>Фигураны ілуге және жүкті байлауға.<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="92" rx="34" ry="6" fill="#0005" filter="url(#sh)"/><rect x="48" y="50" width="64" height="40" rx="7" fill="url(#mt)" stroke="#555"/><rect x="62" y="38" width="36" height="14" rx="6" fill="url(#mt)" stroke="#555"/><circle cx="80" cy="30" r="7" fill="none" stroke="#777" stroke-width="3"/><text x="80" y="76" text-anchor="middle" font-size="14" font-weight="700" fill="#333">100 г</text></svg></div><div class="tx"><b>6. Жүк (гір тасы)</b>Жіпке байланып, вертикаль бағытты көрсетеді (отвес).<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="78" rx="60" ry="6" fill="#0005" filter="url(#sh)"/><rect x="22" y="50" width="88" height="15" fill="#f4c542" stroke="#9a7a10"/><rect x="22" y="50" width="88" height="4" fill="#fff6"/><polygon points="110,50 110,65 138,57" fill="#e8caa0" stroke="#9a7a50"/><polygon points="130,53 130,61 138,57" fill="#333"/><rect x="14" y="50" width="10" height="15" rx="2" fill="#e57373"/></svg></div><div class="tx"><b>7. Қарындаш</b>Фигураны ұшына қойып тексеру үшін. Ұшы өткір!<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div><div class="ic"><div class="ph"><svg viewBox="0 0 160 110"><rect width="160" height="110" fill="url(#tb)"/><ellipse cx="80" cy="78" rx="62" ry="6" fill="#0005" filter="url(#sh)"/><rect x="12" y="40" width="136" height="28" fill="#f5d76e" stroke="#9a7a10"/><path d="M20 40v10M28 40v6M36 40v6M44 40v6M52 40v6M60 40v10M68 40v6M76 40v6M84 40v6M92 40v6M100 40v10M108 40v6M116 40v6M124 40v6M132 40v6M140 40v10" stroke="#333" stroke-width="1"/><text x="20" y="62" font-size="8">0</text><text x="58" y="62" font-size="8">5</text><text x="96" y="62" font-size="8">10</text></svg></div><div class="tx"><b>8. Сызғыш</b>Қиылысу нүктесінің координаталарын өлшеуге.<br><label>Өз фотоңызды қою<input type="file" accept="image/*" hidden></label></div></div></div>
+</section>
+
+<section class="card" id="s7" data-title="Қауіпсіздік ережелері" data-no="7">
+  <div class="sh"><div class="no">7</div><h2>Қауіпсіздік ережелері</h2></div>
+  <ul class="safety"><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M12 3l10 18H2zM12 10v5M12 18v.5</svg><span>Қайшымен және бізбен абайлап жұмыс істеңіз: ұшын өзіңізге және көрші оқушыға қаратпаңыз, пайдаланбағанда қыныма салыңыз.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M4 20h16M6 20V9l6-5 6 5v11</svg><span>Тесікті қатты тақтайшаның (жұмыс төсемінің) үстінде тесіңіз, қолыңызды тесілетін жерден алыс ұстаңыз.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M6 3h12l-2 18H8z</svg><span>Штатив тұрақты тұруы тиіс: оның табанын үстелдің шетінен алыс орналастырыңыз.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z</svg><span>Жүкті (гір тасын) биіктен түсірмеңіз және аяғыңыздың үстінде ұстамаңыз: жіппен берік байлаңыз.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M9 12l2 2 4-4M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z</svg><span>Қарындаштың өткір ұшын бетке, көзге тұтпаңыз; фигураны ұшына абайлап, көз деңгейінен төмен қойыңыз.</span></li><li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" style="color:var(--hot)">M4 6h16M4 12h16M4 18h16</svg><span>Жұмыстан кейін қайшыны, бізді, қарындашты орнына қойып, қағаз қалдықтарын жинаңыз; мұғалімнің нұсқауын орындаңыз.</span></li></ul>
+</section>
+
+<section class="card" id="s8" data-title="Теория мен формулалар" data-no="8">
+  <div class="sh"><div class="no">8</div><h2>Теориялық мәлімет және формулалар</h2></div>
+  <p class="lead">Дененің массалар центрі – бүкіл дененің массасы немесе денелер жүйесінің бүкіл массасы шоғырланған ерекше нүкте. Егер денеге күштің әрекет ету сызығы ерекше нүкте арқылы өтсе, онда дене түзу сызық бойымен қозғалады.</p>
+  <p>Мұндай центрде дененің бүкіл массасы жинақталған деп есептеледі. Сондықтан ондай нүктелік центрді дененің инерция центрі деп те, ауырлық центрі деп те атайды.</p>
+  <div class="tablewrap"><table class="ftable"><thead><tr><th>Формула</th><th>Мағынасы</th></tr></thead><tbody>
+    <tr><td>M = F·d</td><td>Ауырлық күшінің тіреу нүктесіне қатысты моменті (d күш иіні). Тіреу центрден өтсе, d = 0 және M = 0</td></tr>
+  </tbody></table></div>
+  <div class="consts"><div><h4>Неге вертикаль сызық центрден өтеді?</h4><div class="small">Ілулі фигура тоқтағанда ауырлық күшінің моменті нөлге тең болады. Бұл тек центр ілу нүктесінің дәл астында тұрғанда орындалады.</div></div>
+  <div class="agree"><h4>Келісім шарты</h4><div class="small">Үш сызықтың қиылысуынан пайда болған үшбұрыш 5 мм-ден кіші болса, нәтиже сенімді деп есептейміз.</div></div></div>
+</section>
+
+<section class="card" id="s9" data-title="Жұмыс жоспары" data-no="9">
+  <div class="sh"><div class="no">9</div><h2>Жұмыс жоспары және орындау реті</h2></div>
+  <h3 style="margin-top:0">Нұсқаулық</h3>
+  <ol class="steps">
+    <li data-n="1">Қатырма қағаздың бетіне сол қолыңның алақанын төсеп, суретін сызасыз да, қайшымен қиып, жазық фигура жасайсыз.<small>Қайшымен абайлап жұмыс істеңіз.</small></li>
+    <li data-n="2">Фигураның кез келген шетінен бізбен үш тесік жасайсыз.<small>Тесіктер бір-бірінен алыс болсын, қағаздың астына қатты тақтайша қойыңыз.</small></li>
+    <li data-n="3">Біреуінен жіп өткізіп, қатырма қағазды аспаға іліп қоясыз. Жүкке (гір тасына) жіп байлап, оны да аспаға іліп қоясыз.<small>Жүктің жібі вертикаль бағытты көрсетеді.</small></li>
+    <li data-n="4">Фигура тоқтағанша күтіп, ауырлық күші түсетін вертикаль сызықты қатырма қағаздың бетіне мұқият сызасыз.<small>Сызықты жүктің жібі бойымен қарындашпен жүргізіңіз.</small></li>
+    <li data-n="5">Қатырма қағазды басқа тесік арқылы іліп, тәжірибені қайталайсыз да, екінші вертикаль сызықты жүргізесіз.<small>Екі сызықтың қиылысқан нүктесін O деп белгілейсіз: бұл зерттеп отырған дененің массалар орталығы.</small></li>
+    <li data-n="6">Үшінші тесік арқылы іліп, тағы бір вертикаль сызық саласыз.<small>Барлық үш сызық O нүктесі арқылы өтуі тиіс.</small></li>
+    <li data-n="7">Сызғышпен O нүктесінің координаталарын (x, y) өлшеп, таразымен фигураның массасы m-ді анықтайсыз.<small>Координата фигураны шектейтін тікбұрыштың сол жақ-жоғарғы бұрышынан өлшенеді. m мәнін 1-кестеге жазасыз.</small></li>
+    <li data-n="8">Тексеру: фигураны O нүктесі арқылы қарындаштың ұшына қойып көтересіз.<small>Дене ілінген қалпында қозғалмаса, O – массалар орталығы. Содан кейін ұшты O-дан ауытқытып, ұштың N координаталарын оқып, d күш иінін өзіңіз есептейсіз де, 1-кестеге жазасыз.</small></li>
+  </ol>
+</section>
+
+<section class="card" id="s9m" data-title="Интерактивті модель" data-no="▶">
+  <div class="sh"><div class="no">▶</div><h2>Интерактивті модель</h2></div>
+  
+  <div class="stagecard" style="margin-bottom:16px">
+    <div class="stagebar">
+      <div class="seg" id="stepbar" style="flex-wrap:wrap"></div>
+      <div class="phase"><span class="dot" id="phDot"></span><span id="phText"></span></div>
+    </div>
+    <div id="stepTxt" style="padding:10px 14px;font-size:.92rem;border-bottom:1px solid var(--line)"></div>
+    <div style="display:flex;gap:8px;padding:8px 14px"><button class="btn soft small" id="prevBtn" type="button">← Алдыңғы қадам</button><button class="btn solid small" id="nextBtn" type="button">Келесі қадам →</button></div>
+    <svg id="stage" viewBox="0 0 960 440">
+      <g id="gTable"><rect x="0" y="0" width="960" height="440" style="fill:none"/><g id="tf" class="pcl" transform="translate(380 40) scale(2)"></g><text class="tn2" x="480" y="430" text-anchor="middle">үстелдегі көрініс</text></g>
+      <g id="gHang">
+        <path class="stand" d="M40 430H260M70 430V30M70 40H440"/>
+        <g id="fgH"><g id="fgI"></g></g>
+        <line id="thread" class="thread" x1="420" y1="62" x2="420" y2="396"/>
+        <rect id="loadR" x="408" y="396" width="24" height="30" rx="5" style="fill:#94a3b8;stroke:var(--ink)" stroke-width="2"/>
+        <circle cx="420" cy="62" r="4.5" style="fill:var(--ink)"/>
+        <text class="tn2" id="loadT" x="420" y="438" text-anchor="middle">жүк</text>
+        <g id="legend"></g>
+      </g>
+      <g id="gPen" style="display:none">
+        <g id="pf" class="pcl" transform="translate(60 60) scale(1.9)"></g>
+        <text class="tn2" x="190" y="30" text-anchor="middle">үстінен қарағандағы көрініс</text>
+        <text class="tn2" x="790" y="30" text-anchor="middle">қырынан қарағандағы көрініс</text>
+        <g id="side"></g>
+      </g>
+    </svg>
+  </div>
+  <div class="lab">
+    <div class="ctrls">
+      <div class="ctrl c" data-show="1"><div class="top"><span>Фигура</span></div><div class="seg" id="figSeg" style="margin:6px 0"><button type="button" data-f="palm" class="on">Сол қол</button><button type="button" data-f="irr">Кездейсоқ фигура</button></div><button class="btn solid small" id="cutBtn" type="button">Сызып, қию</button></div>
+      <div class="ctrl c" data-show="2"><div class="top"><span>Тесік тесу</span><span class="mono" id="holeN">0 / 3</span></div><div class="small muted" style="margin:4px 0 6px">Бізбен фигураның шетін басыңыз. Тесіктер бір-бірінен алыс болсын.</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn soft small" id="autoH" type="button">Автоматты тесу</button><button class="btn soft small" id="clrH" type="button">Тесіктерді өшіру</button></div></div>
+      <div class="ctrl c" data-show="3,4,5,6,7,9"><div class="top"><span>Іліп қою</span></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><button class="btn solid small" id="relBtn" data-show="3,5,6,9" type="button">Іліп жіберу</button><button class="btn solid small" id="lineBtn" data-show="4,5,6" type="button">Сызық сызу</button><button class="btn soft small" id="clrBtn" data-show="3,4,5,6" type="button">Сызықтарды өшіру</button></div>
+        <div class="top" style="margin-top:10px"><span>Фигураны бұрау</span><span class="mono" id="rotV">0°</span></div><input type="range" id="rot" min="0" max="360" step="1" value="0"></div>
+      <div class="ctrl r" data-show="8"><div class="top"><span>Қарындаш ұшы N</span></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><button class="btn solid small" id="toO" type="button">Ұшты O нүктесіне қою</button><button class="btn soft small" id="toOff" type="button">Ұшты ауытқыту</button></div><div class="small muted" style="margin-top:4px">Ұшты тышқанмен де сүйрей аласыз.</div></div>
+      <div class="ctrl c" data-show="3,9"><div class="top"><span>Жүктің массасы</span><span class="mono" id="loadV">100 г</span></div><input type="range" id="load" min="50" max="500" step="50" value="100"><div class="small muted" style="margin-top:4px">Жүк жіпті тік ұстайды: массасы сызық бағытын өзгертпейді.</div></div>
+      <div class="ctrl g"><label style="display:flex;gap:8px;align-items:center;font-weight:600;font-size:.86rem"><input type="checkbox" id="showC">Нақты массалар орталығын көрсету (тек модельде)</label></div>
+    </div>
+    <div class="panel"><h3 style="margin-top:0">Күш пен момент <span class="chip mix">МОДЕЛЬ</span></h3><div class="calc" id="calc"></div></div>
+  </div>
+  <div class="readouts">
+    <div class="ro"><span class="badge">МОДЕЛЬ</span><div class="k">Масса m</div><div class="v" id="rM">-</div><div class="s" id="rMs"></div></div>
+    <div class="ro cold"><span class="badge">МОДЕЛЬ</span><div class="k">Жүктің массасы</div><div class="v" id="rW">-</div><div class="s">сызық бағытына әсер етпейді</div></div>
+    <div class="ro hot"><span class="badge">МОДЕЛЬ</span><div class="k">O нүктесі, мм</div><div class="v" id="rO" style="font-size:1.15rem">-</div><div class="s" id="rOs"></div></div>
+    <div class="ro mix"><span class="badge">МОДЕЛЬ</span><div class="k">Қарындаш ұшы N, мм</div><div class="v" id="rN" style="font-size:1.15rem">-</div><div class="s">d-ны өзіңіз есептейсіз</div></div>
+    <div class="ro"><span class="badge">МОДЕЛЬ</span><div class="k">O мен нақты центр арасы</div><div class="v" id="rD">-</div><div class="s" id="rDs"></div></div>
+  </div>
+</section>
+
+<section class="card" id="s10" data-title="Нәтижелерді тіркеу" data-no="10">
+  <div class="sh"><div class="no">10</div><h2>Зерттеу нәтижелерін тіркеу</h2></div>
+  <p class="small muted">Жасыл бағандарға модельден оқыған мәндеріңізді енгізесіз (координата фигураны шектейтін тікбұрыштың сол жақ-жоғарғы бұрышынан өлшенеді). Сары бағандағы d шамасын өзіңіз есептейсіз де, «ИИ жауабымен тексеру» батырмасын басасыз: сіздің жауабыңыз модельдің жауабымен салыстырылады. Ондық бөлшекті үтірмен де, нүктемен де жазуға болады.</p>
+    <div class="tblblock"><h3>1-кесте. Масса және күш иіні</h3>
+  <div class="tablewrap"><table><thead><tr><th class="x">m (фигураның массасы), г</th><th class="x">d (күш иіні), мм</th></tr></thead><tbody><tr>
+    <td class="x"><input id="mm" data-t data-save inputmode="decimal"></td><td class="x"><input id="dv" data-t data-save inputmode="decimal"></td></tr><tr><td colspan="2"><input id="dcalc" data-save placeholder="d есептеу жолы" style="width:100%"></td></tr></tbody></table></div>
+  </div>
+  <div class="tblblock"><h3>2-кесте. Тексеру нәтижелері</h3>
+  <div class="tablewrap"><table><thead><tr><th>Тексеру</th><th class="x">Бақылау</th></tr></thead><tbody>
+    <tr><td>Қарындаш ұшы O нүктесінде тұр</td><td class="x"><select id="ob1" data-save><option value="">таңдаңыз</option><option>қозғалмады</option><option>қисайды</option></select></td></tr>
+    <tr><td>Қарындаш ұшы O нүктесінен ауытқыған</td><td class="x"><select id="ob2" data-save><option value="">таңдаңыз</option><option>қозғалмады</option><option>қисайды</option></select></td></tr>
+  </tbody></table></div></div>
+  <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center">
+    <button class="btn chkbtn" id="checkBtn" type="button">ИИ жауабымен тексеру</button>
+    <button class="btn soft small" id="demoBtn" type="button">Модель деректерімен толтыру</button>
+    <button class="btn soft small" id="clearTbl" type="button">Кестелерді тазалау</button>
+    <span class="score" id="score"></span>
+  </div>
+</section>
+
+<section class="card" id="s11" data-title="Талдау және қорытынды" data-no="11">
+  <div class="sh"><div class="no">11</div><h2>Талдау және қорытынды</h2></div>
+  <div class="qa">
+    <div><label for="q1">1. Үш сызық бір нүктеде қиылысты ма? Үшбұрыш болса, оның өлшемі қандай және неден?</label><textarea id="q1" data-save></textarea></div>
+    <div><label for="q2">2. Қарындаш ұшы O нүктесінде тұрғанда фигура неге қозғалмайды?</label><textarea id="q2" data-save></textarea></div>
+    <div><label for="q3">3. Қарындаш ұшы O нүктесінен ауытқыса не болады? Моментпен түсіндіріңіз.</label><textarea id="q3" data-save></textarea></div>
+    <div><label for="q4">4. Нәтижедегі айырмашылыққа әсер еткен факторлар (кемінде үшеуі) қандай?</label><textarea id="q4" data-save></textarea></div>
+  </div>
+  <h3>Болжамыңыз расталды ма?</h3>
+  <input type="hidden" id="hypRes" data-save>
+  <div class="radios" id="hypRadios"><button type="button" data-v="yes">расталды</button><button type="button" data-v="part">ішінара расталды</button><button type="button" data-v="no">расталмады</button></div>
+  <label for="hypWhy" style="font-weight:700;font-size:.95rem">Неге? Болжамыңызды қалай түзетер едіңіз?</label>
+  <textarea id="hypWhy" data-save style="margin-top:6px"></textarea>
+</section>
+
+<section class="card" id="s12" data-title="Тест" data-no="12">
+  <div class="sh"><div class="no">12</div><h2>Білімді тексеру тесті</h2></div>
+  <p class="small muted">Әр сұраққа бір жауап таңдаңыз. «Келіспеймін, себебі…» батырмасы арқылы жауаптың немесе түсіндірменің қай жерімен келіспейтініңізді өз сөзіңізбен жазуға болады.</p>
+  <div id="quiz"></div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn chkbtn" id="quizBtn" type="button">Тексеру</button><button class="btn soft small" id="quizClr" type="button">Қайта бастау</button><span id="quizScore"></span></div>
+</section>
+
+<section class="card" id="s13" data-title="Өзін-өзі бағалау" data-no="13">
+  <div class="sh"><div class="no">13</div><h2>Өзін-өзі бағалау</h2></div>
+  <ul class="selfcheck">
+    <li><label><input type="checkbox" id="sc1" data-save>Болжамымды тәжірибеге дейін жаздым.</label></li>
+    <li><label><input type="checkbox" id="sc2" data-save>Үш тесік арқылы үш вертикаль сызық жүргіздім.</label></li>
+    <li><label><input type="checkbox" id="sc3" data-save>O нүктесін қарындаш ұшымен тексердім.</label></li>
+    <li><label><input type="checkbox" id="sc4" data-save>Күш иінін d өзім есептеп, зерттеу сұрағына жауап бердім.</label></li>
+    <li><label><input type="checkbox" id="sc5" data-save>Қауіпсіздік ережелерін сақтап, жұмыс орнымды жинадым.</label></li>
+  </ul>
+  <div class="progress"><i id="scBar" style="width:0"></i></div><div class="small muted" id="scTxt"></div>
+</section>
+
+<section class="card" id="s14" data-title="Өзара тексеру" data-no="14">
+  <div class="sh"><div class="no">14</div><h2>Өзара тексеру: кері байланыс, ескерту және түзету</h2></div>
+  <div class="metarow" style="grid-template-columns:1fr"><div><label for="grp">Біз тексерген топ</label><input type="text" id="grp" data-save placeholder="Топтың аты немесе оқушылар"></div></div>
+  <div class="two">
+    <div><h3 style="margin-top:0">Басқа топқа берген кері байланысымыз</h3><textarea id="note1" data-save placeholder="Не жақсы болды, қандай ұсыныс бар..."></textarea></div>
+    <div><h3 style="margin-top:0">Бізге берілген ескерту</h3><textarea id="note2" data-save placeholder="Ескерту: ..."></textarea></div>
+  </div>
+  <h3>Ескертуден кейін енгізген түзетуіміз</h3>
+  <textarea id="note3" data-save placeholder="Түзету: нені және қалай өзгерттік, нәтиже қалай өзгерді..."></textarea>
+</section>
+<footer>№8 зертханалық жұмыс · Жазық фигураның массалар орталығын табу · Физикадан жобалық жұмыс</footer>
+</main></div>
+<div class="toast" id="toast"></div>
+<script id="saved" type="application/json">{}</script>
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('lab8_'+k); return v===null?d:JSON.parse(v);}catch(e){return d;} },
+  set(k,v){ try{ localStorage.setItem('lab8_'+k,JSON.stringify(v)); }catch(e){} }
+};
+const fmt = (x,d=1) => (x===null||x===undefined||!isFinite(x)) ? "-" : Number(x).toFixed(d).replace(".",",").replace("-","−");
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sci(x,p=3){
+  if(!isFinite(x)) return '-';
+  if(x===0) return '0';
+  const ax=Math.abs(x);
+  if(ax>=0.01&&ax<1e5) return ax>=100?fmt(x,1):ax>=1?fmt(x,2):String(Number(x.toPrecision(p))).replace('.',',');
+  const e=Math.floor(Math.log10(ax)); const m=x/Math.pow(10,e);
+  return fmt(m,p-1)+'·10'+String(e).split('').map(c=>SUP[c]).join('');
+}
+const SUPR={'⁻':'-','⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'};
+const num = v => { if(v===''||v==null) return NaN; let s=String(v).trim().replace(/\s+/g,'').replace(/,/g,'.').replace(/−/g,'-');
+  s=s.replace(/[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+/g,m=>'^'+m.split('').map(c=>SUPR[c]).join(''));
+  const m=s.match(/^([-+]?\d*\.?\d+)(?:[·*×x]10\^?([-+]?\d+))$/i); if(m) return parseFloat(m[1])*Math.pow(10,+m[2]);
+  if(!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return NaN; return parseFloat(s); };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2200); }
+/* ---------- LOW VISION MODE ---------- */
+const A11Y_DEF={on:false,fs:0,cs:0,img:true,ff:0,ls:0,lh:0};
+let A11Y=Object.assign({},A11Y_DEF,(()=>{ try{ return JSON.parse(localStorage.getItem('lab8_a11y'))||{}; }catch(e){ return {}; } })());
+function applyA11y(){
+  const h=document.documentElement;
+  [...h.classList].filter(c=>/^(a11y-on|noimg|(fs|cs|ff|ls|lh)-\d)$/.test(c)).forEach(c=>h.classList.remove(c));
+  $('a11yBar').hidden=!A11Y.on;
+  if(A11Y.on){ h.classList.add('a11y-on','fs-'+A11Y.fs,'cs-'+A11Y.cs,'ff-'+A11Y.ff,'ls-'+A11Y.ls,'lh-'+A11Y.lh); if(!A11Y.img) h.classList.add('noimg');
+    h.style.setProperty('--a11yh',$('a11yBar').offsetHeight+'px'); }
+  else $('a11yPanel').hidden=true;
+  ['fs','cs','ff','ls','lh'].forEach(k=>document.querySelectorAll(`#a11yBar [data-${k}]`).forEach(b=>b.classList.toggle('on',+b.dataset[k]===A11Y[k])));
+  $('a11yImg').classList.toggle('on',!A11Y.img);
+  try{ localStorage.setItem('lab8_a11y',JSON.stringify(A11Y)); }catch(e){}
+}
+const setA=(k,v)=>{ A11Y[k]=v; applyA11y(); };
+$('a11yOn').onclick=()=>setA('on',true);
+$('a11yOff').onclick=()=>setA('on',false);
+$('a11ySet').onclick=()=>{ $('a11yPanel').hidden=!$('a11yPanel').hidden; applyA11y(); };
+$('a11yClose').onclick=()=>{ $('a11yPanel').hidden=true; applyA11y(); };
+$('a11yReset').onclick=()=>{ A11Y=Object.assign({},A11Y_DEF,{on:true}); applyA11y(); };
+$('a11yImg').onclick=()=>setA('img',!A11Y.img);
+['fs','cs','ff','ls','lh'].forEach(k=>document.querySelectorAll(`#a11yBar [data-${k}]`).forEach(b=>b.onclick=()=>setA(k,+b.dataset[k])));
+
+
+/*PHYS*/
+const SIG=3e-7; /* 300 г/м² қатырма қағаз: кг/мм² */
+const rn=()=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const FIGS={
+ palm:{n:'Алақан',P:[[30,172],[22,132],[12,112],[2,96],[0,84],[6,76],[14,80],[24,98],[30,100],[30,58],[31,30],[35,24],[41,30],[42,62],[44,60],[45,16],[50,10],[55,16],[56,60],[58,62],[59,24],[64,18],[69,24],[70,66],[72,70],[73,44],[77,38],[82,44],[84,98],[86,120],[80,150],[74,172]],H:[[50,16],[7,84],[74,156]]},
+ irr:{n:'Кездейсоқ фигура',P:[[0,0],[90,12],[74,62],[104,112],[34,128],[10,70]],H:[[10,10],[84,14],[34,118]]}
+};
+FIGS.palm.P=FIGS.palm.P.map(p=>[86-p[0],p[1]]);FIGS.palm.H=FIGS.palm.H.map(p=>[86-p[0],p[1]]);FIGS.palm.n='Сол қол алақаны';
+function geom(P){let A2=0,cx=0,cy=0,J=0;
+ for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],c=a[0]*b[1]-b[0]*a[1];
+  A2+=c;cx+=(a[0]+b[0])*c;cy+=(a[1]+b[1])*c;J+=c*(a[0]*a[0]+a[0]*b[0]+b[0]*b[0]+a[1]*a[1]+a[1]*b[1]+b[1]*b[1]);}
+ const A=A2/2;cx/=6*A;cy/=6*A;J=Math.abs(J/12);const Aa=Math.abs(A),m=SIG*Aa;
+ return {A:Aa,cx,cy,m,Ic:(SIG*J-m*(cx*cx+cy*cy))*1e-6};}
+function prep(f){const mx=Math.min(...f.P.map(p=>p[0])),my=Math.min(...f.P.map(p=>p[1]));
+ const P=f.P.map(p=>[p[0]-mx,p[1]-my]),H=f.H.map(p=>[p[0]-mx,p[1]-my]);
+ const w=Math.max(...P.map(p=>p[0])),h=Math.max(...P.map(p=>p[1]));
+ return Object.assign({n:f.n,P,H,w,h},geom(P));}
+const rbOf=(F,p)=>[(F.cx-p[0])/1000,(F.cy-p[1])/1000];
+const FR=0.002; /* тіреудегі құрғақ үйкеліс: күш иіні 2 мм-ден аз болса, фигура қозғалмайды */
+function stepP(F,p,st,c,dt){const r=rbOf(F,p),d=Math.hypot(r[0],r[1]),b=Math.atan2(r[1],r[0]),I=F.Ic+F.m*d*d;
+ if(Math.abs(d*Math.cos(st.phi+b))<FR&&Math.abs(st.w)<0.5){st.w=0;return;}
+ st.w+=((F.m*9.8*d/I)*Math.cos(st.phi+b)-c*st.w)*dt;st.phi+=st.w*dt;}
+function settledP(F,p,st){const r=rbOf(F,p),d=Math.hypot(r[0],r[1]);
+ if(Math.abs(st.w)>0.02)return false;if(Math.abs(d*Math.cos(st.phi+Math.atan2(r[1],r[0])))<FR)return true;
+ const t=Math.PI/2-Math.atan2(r[1],r[0]);return Math.abs(Math.atan2(Math.sin(st.phi-t),Math.cos(st.phi-t)))<0.004;}
+function mkLine(p,phi,errDeg){const e=rn()*errDeg*Math.PI/180,u0=Math.sin(phi),u1=Math.cos(phi);
+ const u=[u0*Math.cos(e)-u1*Math.sin(e),u0*Math.sin(e)+u1*Math.cos(e)],off=rn()*errDeg*0.4;
+ return {p:[p[0]+off*u[1],p[1]-off*u[0]],u};}
+function inter(a,b){const dx=b.p[0]-a.p[0],dy=b.p[1]-a.p[1],det=-a.u[0]*b.u[1]+b.u[0]*a.u[1];
+ if(Math.abs(det)<1e-3)return null;const t=(-dx*b.u[1]+b.u[0]*dy)/det;return [a.p[0]+t*a.u[0],a.p[1]+t*a.u[1]];}
+function pairsO(L){const o=[];for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const q=inter(L[i],L[j]);if(q)o.push(q);}return o;}
+function estO(L){const o=pairsO(L);if(!o.length)return null;return [o.reduce((s,q)=>s+q[0],0)/o.length,o.reduce((s,q)=>s+q[1],0)/o.length];}
+/*ENDPHYS*/
+
+/* ---------- MODEL ---------- */
+let F=prep(FIGS.palm);
+const S={fig:'palm',mode:'table',step:1,max:1,cut:false,rel:false,hold:false,H:[],hole:0,phi:0,w:0,err:0.6,load:100,c:4,show:false,lines:[null,null,null],T:[0,0],dirty:true};
+const SC=1.55,VW={table:[380,40,2],pen:[60,60,1.9]};
+const STEPS=[...document.querySelectorAll('#s9 .steps li')].map(li=>[li.childNodes[0].textContent.trim(),(li.querySelector('small')||{}).textContent||'']);
+const pts=()=>F.P.map(p=>p.join(',')).join(' ');
+const Oe=()=>estO(S.lines.filter(Boolean));
+const lc=()=>S.lines.filter(Boolean).length;
+const pv=()=>S.hole<3?(S.H[S.hole]||[F.w/2,0]):(Oe()||S.H[0]);
+const setT=(id,h)=>{const e=$(id);if(e._h!==h){e._h=h;e.innerHTML=h;}};
+function release(){const p=pv(),r=rbOf(F,p);S.phi=S.hole<3?Math.PI/2-Math.atan2(r[1],r[0])+1.3:0.8+Math.random()*1.5;S.w=0;}
+function seg(id,attr,val){document.querySelectorAll('#'+id+' button').forEach(b=>b.classList.toggle('on',b.dataset[attr]==String(val)));}
+function inPoly(P,q){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>q[1])!==(b[1]>q[1])&&q[0]<(b[0]-a[0])*(q[1]-a[1])/(b[1]-a[1])+a[0])c=!c;}return c;}
+function edgeD(P,q){let m=1e9;for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],dx=b[0]-a[0],dy=b[1]-a[1],t=Math.max(0,Math.min(1,((q[0]-a[0])*dx+(q[1]-a[1])*dy)/(dx*dx+dy*dy||1)));m=Math.min(m,Math.hypot(q[0]-a[0]-t*dx,q[1]-a[1]-t*dy));}return m;}
+function holeErr(q){if(!inPoly(F.P,q))return 'Тесік фигураның ішінде болуы керек';if(edgeD(F.P,q)>12)return 'Тесікті фигураның шетіне жақын тесіңіз';
+ if(Math.hypot(F.cx-q[0],F.cy-q[1])<30)return 'Тесік центрге тым жақын: шетке жақынырақ тесіңіз';
+ const a=Math.atan2(F.cy-q[1],F.cx-q[0]);for(const h of S.H){if(Math.hypot(h[0]-q[0],h[1]-q[1])<35)return 'Тесіктер бір-бірінен алыс болсын';
+  if(Math.abs(Math.sin(a-Math.atan2(F.cy-h[1],F.cx-h[0])))<0.4)return 'Бұл тесік басқа тесікпен бір сызыққа түседі: басқа жерден тесіңіз';}return '';}
+function canNext(){const n=S.step;return n===1?S.cut:n===2?S.H.length===3:n===3?S.rel:n===4?lc()>=1:n===5?lc()>=2:n===6?lc()>=3:true;}
+const WHY=['Алдымен фигураны сызып, қиыңыз','Үш тесік тесіңіз','Фигураны іліп жіберіңіз','Алдымен 1-сызықты сызыңыз','Алдымен 2-сызықты сызыңыз','Алдымен 3-сызықты сызыңыз'];
+function goStep(n){S.step=n;S.max=Math.max(S.max,n);S.mode=n<=2?'table':n===8?'pen':'hang';
+ if(n<=4)S.hole=0;if(n===5)S.hole=1;if(n===6||n===7)S.hole=2;if(n===9)S.hole=3;
+ if(S.mode==='hang'&&[3,5,6,9].includes(n)){release();S.hold=true;if(n!==3)S.rel=true;}else S.hold=false;
+ if(n===8&&Oe())S.T=Oe().map(v=>Math.max(0,v));
+ S.dirty=true;sync();}
+function sync(){seg('figSeg','f',S.fig);
+ ['Table','Hang','Pen'].forEach(m=>$('g'+m).style.display=S.mode===m.toLowerCase()?'':'none');
+ document.querySelectorAll('#s9m [data-show]').forEach(e=>e.style.display=e.dataset.show.split(',').includes(String(S.step))?'':'none');
+ $('stepbar').innerHTML=STEPS.map((t,i)=>`<button type="button" data-s="${i+1}" class="${S.step===i+1?'on':''}" ${i+1>S.max?'disabled':''}>${i+1}</button>`).join('');
+ $('stepTxt').innerHTML=`<b>${S.step}-қадам.</b> ${STEPS[S.step-1][0]} <span class="muted small">${STEPS[S.step-1][1]}</span>`;
+ $('nextBtn').style.display=S.step===STEPS.length?'none':'';$('prevBtn').style.display=S.step===1?'none':'';
+ $('rot').value=Math.round(((S.phi*180/Math.PI)%360+360)%360);}
+function setFig(k){S.fig=k;F=prep(FIGS[k]);S.lines=[null,null,null];S.H=[];S.cut=false;S.rel=false;S.max=1;S.T=[F.cx,F.cy];goStep(1);}
+const holeSvg=(q,i,r,fs)=>`<circle class="hole" cx="${q[0]}" cy="${q[1]}" r="${r}"/><text x="${q[0]+r+1.3}" y="${q[1]+3}" font-size="${fs}" style="fill:var(--ink)">${i+1}</text>`;
+function drawTable(){let h='';
+ if(!S.cut)h=`<rect x="-24" y="-18" width="${F.w+48}" height="${F.h+36}" rx="3" class="cb"/><polygon points="${pts()}" style="fill:#f1c9a5;stroke:#8a5a2b;stroke-width:.9;opacity:.95"/><text x="-20" y="-6" font-size="6" style="fill:var(--ink)">қатырма қағаз + ${S.fig==='palm'?'сол қол':'фигура'} контуры</text>`;
+ else{h=`<polygon points="${pts()}" transform="translate(1.5 2)" style="fill:#0003"/><polygon class="cb" points="${pts()}"/>`;S.H.forEach((q,i)=>h+=holeSvg(q,i,2.2,7));}
+ $('tf').innerHTML=h;}
+function drawHang(){const p=pv();
+ let h=`<g transform="scale(${SC}) translate(${-p[0]} ${-p[1]})"><clipPath id="cpf"><polygon points="${pts()}"/></clipPath><polygon points="${pts()}" transform="translate(1.2 1.8)" style="fill:#0003"/><polygon class="cb" points="${pts()}"/>`;
+ S.lines.forEach((l,i)=>{if(l)h+=`<line class="ln${i}" clip-path="url(#cpf)" x1="${l.p[0]-l.u[0]*300}" y1="${l.p[1]-l.u[1]*300}" x2="${l.p[0]+l.u[0]*300}" y2="${l.p[1]+l.u[1]*300}" stroke-width="1.1"/>`;});
+ const O=Oe();if(O)h+=`<circle cx="${O[0]}" cy="${O[1]}" r="2.4" style="fill:var(--hot)"/><text x="${O[0]+4}" y="${O[1]-3}" font-size="8" font-weight="700" style="fill:var(--hot)">O</text>`;
+ if(S.show)h+=`<circle cx="${F.cx}" cy="${F.cy}" r="4.5" fill="none" stroke="#0f9d58" stroke-width="1.2" stroke-dasharray="2 1.5"/>`;
+ S.H.forEach((q,i)=>h+=holeSvg(q,i,2.2,7));
+ $('fgI').innerHTML=h+'</g>';
+ let g=`<text class="tn2" x="640" y="70">Жүргізілген сызықтар</text>`;
+ [0,1,2].forEach(i=>{g+=`<line class="ln${i}" x1="640" x2="680" y1="${96+i*26}" y2="${96+i*26}" stroke-width="3"/><text class="tn2" x="692" y="${100+i*26}">${i+1}-тесік: ${S.lines[i]?'сызылды':'-'}</text>`;});
+ $('legend').innerHTML=g;}
+function drawPen(){const T=S.T,d=Math.hypot(F.cx-T[0],F.cy-T[1]);
+ let h=`<polygon class="cb" points="${pts()}"/>`;
+ const O=Oe();if(O)h+=`<circle cx="${O[0]}" cy="${O[1]}" r="2" style="fill:var(--hot)"/><text x="${O[0]+3}" y="${O[1]-3}" font-size="7" style="fill:var(--hot)">O</text>`;
+ if(S.show)h+=`<circle cx="${F.cx}" cy="${F.cy}" r="4" fill="none" stroke="#0f9d58" stroke-width="1.1"/><text x="${F.cx+5}" y="${F.cy+3}" font-size="7" style="fill:#0f9d58">F ⊗</text>`;
+ h+=`<circle cx="${T[0]}" cy="${T[1]}" r="3.2" style="fill:var(--ink)"/><circle cx="${T[0]}" cy="${T[1]}" r="5.5" fill="none" style="stroke:var(--ink)" stroke-width=".8"/><text x="${T[0]+7}" y="${T[1]-5}" font-size="7" style="fill:var(--ink)">N ⊙ (ұш)</text>`;
+ $('pf').innerHTML=h;
+ const bal=d<=2,sg=F.cx-T[0]>=0?1:-1;$('tilt').style.transform=`rotate(${bal?0:sg*Math.min(26,d*.9)}deg)`;}
+function status(){const n=S.step;
+ if(n===1)return S.cut?['ok','Фигура қиылды ✓ «Келесі қадамға» өтіңіз']:['run','Сол қолды қатырма қағазға төсеп, контурын сызып, қиыңыз'];
+ if(n===2)return S.H.length===3?['ok','Үш тесік дайын ✓']:['run',`Тесік тесіңіз: ${S.H.length} / 3`];
+ if(S.mode==='pen'){const d=Math.hypot(F.cx-S.T[0],F.cy-S.T[1]);
+  return d<=2?['ok','Ұш массалар орталығында: фигура горизонталь қалпын сақтайды ✓']:['bad','Ұш массалар орталығынан тыс: ауырлық күшінің моменті фигураны қисайтады'];}
+ const p=pv(),set=settledP(F,p,S),r=rbOf(F,p),d=Math.hypot(r[0],r[1])*1000;
+ if(S.hold)return['run','Фигура қолмен ұсталып тұр. «Іліп жіберу» батырмасын басыңыз'];
+ if(S.hole===3){if(!set)return['run','Фигура шеге төңірегінде қозғалып жатыр…'];
+  return d<=2?['ok','Шеге O нүктесінде: фигура қандай қалыпқа бұрылса да, сол қалпында қалады ✓']:['bad','Фигура бұрылып кетті: O нақты центр емес'];}
+ return set?['ok',n>=4&&n<=6?'Фигура тыныштықта. «Сызық сызу» батырмасын басуға болады':'Фигура тыныштықта']:['run','Фигура тербеліп жатыр, тоқтағанша күтіңіз…'];}
+function texts(){const Fg=F.m*9.8;
+ setT('calc',`<div class="cl cold"><span class="n">F</span><span>F = m·g = <span class="r">${sci(Fg,3)} Н</span></span></div><div class="cl mix"><span class="n">M</span><span>M = F·d. d күш иінін өзіңіз есептеңіз</span></div>`);
+ setT('rM',fmt(F.m*1000,2)+' г');setT('rMs','S = '+fmt(F.A/100,1)+' см²');setT('rW',S.load+' г');setT('holeN',S.H.length+' / 3');
+ const O=Oe();setT('rO',O?`x = ${fmt(O[0],1)}; y = ${fmt(O[1],1)}`:'-');setT('rOs','сызықтар: '+lc()+' / 3');
+ setT('rN',S.step>=8?`x = ${fmt(S.T[0],1)}; y = ${fmt(S.T[1],1)}`:'-');
+ const D=O?Math.hypot(O[0]-F.cx,O[1]-F.cy):NaN;setT('rD',O?fmt(D,1)+' мм':'-');setT('rDs',O?(D<=5?'сәйкес ✓':'ауытқу үлкен: сызуды мұқият қайталаңыз'):'');
+ const st=status();setT('phText',st[1]);$('phDot').style.background=st[0]==='ok'?'var(--exp)':st[0]==='bad'?'var(--hot)':'var(--cold)';}
+let last=0;
+function loop(ts){const dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;
+ if(S.mode==='hang'){if(!S.hold){const p=pv(),n=Math.round(dt*240);for(let i=0;i<n;i++)stepP(F,p,S,S.c,1/240);}
+  $('fgH').setAttribute('transform',`translate(420 62) rotate(${(S.phi*180/Math.PI).toFixed(2)})`);
+  if(document.activeElement!==$('rot')){const a=Math.round(((S.phi*180/Math.PI)%360+360)%360);$('rot').value=a;$('rotV').textContent=a+'°';}}
+ if(S.dirty){S.dirty=false;S.mode==='hang'?drawHang():S.mode==='pen'?drawPen():drawTable();}
+ texts();requestAnimationFrame(loop);}
+document.querySelectorAll('#figSeg button').forEach(b=>b.onclick=()=>setFig(b.dataset.f));
+$('stepbar').onclick=e=>{const b=e.target.closest('button');if(b&&!b.disabled)goStep(+b.dataset.s);};
+$('prevBtn').onclick=()=>goStep(S.step-1);
+$('nextBtn').onclick=()=>canNext()?goStep(S.step+1):toast(WHY[S.step-1]);
+$('cutBtn').onclick=()=>{S.cut=true;S.dirty=true;toast('Контур сызылып, фигура қиылды');};
+$('autoH').onclick=()=>{if(!S.cut)return;S.H=F.H.map(q=>q.slice());S.dirty=true;};
+$('clrH').onclick=()=>{S.H=[];S.lines=[null,null,null];S.dirty=true;};
+$('relBtn').onclick=()=>{if(S.hold){S.hold=false;S.rel=true;}else release();};
+$('lineBtn').onclick=()=>{if(S.hold||!settledP(F,pv(),S))return toast('Алдымен фигура тоқтағанша күтіңіз');
+ S.lines[S.hole]=mkLine(pv(),S.phi,S.err);S.dirty=true;toast((S.hole+1)+'-тесік арқылы вертикаль сызық жүргізілді');};
+$('clrBtn').onclick=()=>{S.lines=[null,null,null];S.dirty=true;};
+$('rot').oninput=e=>{S.phi=+e.target.value*Math.PI/180;S.w=0;S.hold=false;if(S.step===3)S.rel=true;$('rotV').textContent=e.target.value+'°';};
+$('load').oninput=e=>{S.load=+e.target.value;$('loadV').textContent=S.load+' г';const h=22+(S.load-50)/450*20;$('loadR').setAttribute('height',h);$('loadT').textContent='жүк, '+S.load+' г';};
+$('showC').onchange=e=>{S.show=e.target.checked;S.dirty=true;};
+$('toO').onclick=()=>{const O=Oe();if(!O)return;S.T=O.slice();S.dirty=true;};
+$('toOff').onclick=()=>{const O=Oe()||[F.cx,F.cy];S.T=[Math.min(F.w,O[0]+16),Math.min(F.h,O[1]+10)];S.dirty=true;};
+const stg=$('stage');let drag=false;
+function ptr(e,cl){const pt=stg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const q=pt.matrixTransform(stg.getScreenCTM().inverse()),v=VW[S.mode];
+ const r=[(q.x-v[0])/v[2],(q.y-v[1])/v[2]];return cl?[Math.max(0,Math.min(F.w,r[0])),Math.max(0,Math.min(F.h,r[1]))]:r;}
+stg.addEventListener('pointerdown',e=>{
+ if(S.mode==='pen'){drag=true;stg.setPointerCapture(e.pointerId);S.T=ptr(e,1);S.dirty=true;}
+ else if(S.mode==='table'&&S.step===2&&S.cut){if(S.H.length>=3)return toast('Үш тесік жасалды');const q=ptr(e).map(v=>Math.round(v*10)/10),er=holeErr(q);if(er)return toast(er);S.H.push(q);S.dirty=true;}});
+stg.addEventListener('pointermove',e=>{if(drag){S.T=ptr(e,1);S.dirty=true;}});
+stg.addEventListener('pointerup',()=>{drag=false;});
+$('side').innerHTML=`<g id="tilt" style="transform-origin:790px 330px"><rect x="735" y="325" width="110" height="6" class="cb"/></g><polygon points="790,334 783,425 797,425" fill="#f4c542" stroke="#9a7a10"/><polygon points="787,334 793,334 790,340" fill="#333"/><path d="M790 330V285" stroke="var(--exp)" stroke-width="3"/><text class="tn2" x="790" y="276" text-anchor="middle">N</text><text class="tn2" x="790" y="445" text-anchor="middle">қарындаш</text>`;
+
+/* ---------- TABLES ---------- */
+const TID=['mm','dv','dcalc','ob1','ob2'];
+function judge(id,truth,tol){const el=$(id);el.classList.remove('good','bad');if(el.value.trim()==='')return null;
+ const v=num(el.value),ok=isFinite(v)&&isFinite(truth)&&Math.abs(v-truth)<=Math.max(tol,0.03*Math.abs(truth));el.classList.add(ok?'good':'bad');return ok;}
+const dNow=()=>{const O=Oe();return O?Math.hypot(O[0]-S.T[0],O[1]-S.T[1]):NaN;};
+function judgeSel(id,truth){const el=$(id);el.classList.remove('good','bad');if(!el.value)return null;const ok=el.value===truth;el.classList.add(ok?'good':'bad');return ok;}
+function runCheck(){const O=Oe(),Dc=O?Math.hypot(O[0]-F.cx,O[1]-F.cy):NaN,dn=dNow(),f=v=>isFinite(v)?fmt(v,1):'-';
+ const rows=[];let ok=0,all=0;
+ const add=(r,name,ans)=>{if(r===null)return;all++;if(r)ok++;rows.push(`<div>${r?'✓':'✗'} ${name}: ${r?'дұрыс':'қате'}${r?'':' · дұрыс жауап: '+ans}</div>`);};
+ add(judge('mm',F.m*1000,0.2),'m',f(F.m*1000)+' г');
+ if(!O&&$('dv').value.trim()){$('dv').classList.remove('good','bad');rows.push('<div>d: алдымен модельде O нүктесін табыңыз (кемінде екі сызық)</div>');}
+ else add(judge('dv',dn,1),'d',f(dn)+' мм (қазіргі N: x = '+f(S.T[0])+'; y = '+f(S.T[1])+', O: x = '+f(O&&O[0])+'; y = '+f(O&&O[1])+')');
+ add(isFinite(Dc)?judgeSel('ob1',Dc<=2?'қозғалмады':'қисайды'):null,'Ұш O нүктесінде',Dc<=2?'қозғалмады':'қисайды');
+ add(judgeSel('ob2','қисайды'),'Ұш O-дан ауытқығанда','қисайды');
+ $('score').innerHTML=all||rows.length?(all?`<span class="pill ${ok===all?'ok':ok>=all*.7?'mid':'bad'}">${ok} / ${all}</span>`:'')+'<div class="small" style="margin-top:6px">ИИ жауабы:'+rows.join('')+'</div>':'Алдымен кестені толтырыңыз';}
+$('checkBtn').onclick=runCheck;
+const put=(id,v)=>{$(id).value=String(v).replace('.',',');};
+$('demoBtn').onclick=()=>{if(!Oe())return toast('Алдымен модельде кемінде екі сызық сызыңыз');
+ put('mm',(Math.round((F.m*1000+rn()*0.05)*10)/10).toFixed(1));put('dv',fmt(dNow(),1).replace(',','.'));$('ob1').value=Math.hypot(Oe()[0]-F.cx,Oe()[1]-F.cy)<=2?'қозғалмады':'қисайды';$('ob2').value='қисайды';persist();toast('Кесте модель деректерімен толтырылды');};
+$('clearTbl').onclick=()=>{TID.forEach(i=>{$(i).value='';$(i).classList.remove('good','bad');});$('score').innerHTML='';persist();};
+
+/* ---------- QUIZ ---------- */
+const QZ=[
+ {q:'Массалар центрі дегеніміз не?',o:['Дененің бүкіл массасы жиналған деп есептелетін нүкте','Дененің ең шеткі нүктесі','Тесіктің орны'],a:0,e:'Массалар центрі – дененің бүкіл массасы жиналған деп есептелетін нүкте.'},
+ {q:'Ілулі фигура тоқтағанда тік сызық қай нүкте арқылы өтеді?',o:['Массалар центрі арқылы','Фигураның шеті арқылы','Ешқайсысы арқылы емес'],a:0,e:'Фигура тоқтағанда массалар центрі ілу нүктесінің дәл астында тұрады.'},
+ {q:'Екі тік сызық қиылысқан нүкте нені көрсетеді?',o:['Массалар центрін','Жіптің ұзындығын','Жүктің массасын'],a:0,e:'Сызықтардың қиылысу нүктесі – массалар центрі.'},
+ {q:'Қарындаш ұшы массалар центрінде тұрса, фигура не істейді?',o:['Қозғалмай, тепе-теңдікте қалады','Қисайып кетеді','Жоғары көтеріледі'],a:0,e:'Центрде күш иіні d = 0, сондықтан M = 0 және фигура қисаймайды.'},
+ {q:'Қарындаш ұшы центрден алыс тұрса, фигура не істейді?',o:['Қисаяды','Қозғалмайды','Жеңілдейді'],a:0,e:'Күш иіні d нөл емес, сондықтан момент фигураны қисайтады.'}];
+$('quiz').innerHTML=QZ.map((z,i)=>`<div class="qz" data-i="${i}"><p style="margin:0 0 6px"><b>${i+1}. ${z.q}</b></p>${z.o.map((t,j)=>`<label class="qo"><input type="radio" name="q${i}" id="q${i}_${j}" data-save>${t}</label>`).join('')}<div class="qe"></div><button type="button" class="btn soft small dis">Келіспеймін, себебі…</button><textarea id="why${i}" data-save style="display:none" placeholder="Қай жауаппен немесе түсіндірмемен келіспейсіз және неге? Өз ойыңызды жазыңыз."></textarea></div>`).join('');
+$('quiz').addEventListener('click',e=>{const b=e.target.closest('.dis');if(!b)return;const t=b.parentNode.querySelector('textarea');t.style.display=t.style.display==='none'?'block':'none';if(t.style.display==='block')t.focus();});
+function quizCheck(){let ok=0,ans=0;
+ QZ.forEach((z,i)=>{const box=document.querySelector(`.qz[data-i="${i}"]`),labs=box.querySelectorAll('.qo');let sel=-1;
+  labs.forEach((l,j)=>{l.classList.remove('right','wrong');if($(`q${i}_${j}`).checked)sel=j;});
+  if(sel<0){box.querySelector('.qe').textContent='Жауап таңдалмады.';return;}
+  ans++;if(sel===z.a){ok++;labs[sel].classList.add('right');}else{labs[sel].classList.add('wrong');labs[z.a].classList.add('right');}
+  box.querySelector('.qe').innerHTML=(sel===z.a?'<b>Дұрыс.</b> ':'<b>Дұрыс емес.</b> ')+z.e;});
+ $('quizScore').innerHTML=`<span class="pill ${ok===QZ.length?'ok':ok>=QZ.length*.7?'mid':'bad'}">${ok} / ${QZ.length}</span>`+(ans<QZ.length?' жауап берілмеген сұрақтар бар':'');}
+$('quizBtn').onclick=quizCheck;
+$('quizClr').onclick=()=>{document.querySelectorAll('#quiz input').forEach(x=>x.checked=false);document.querySelectorAll('#quiz .qo').forEach(l=>l.classList.remove('right','wrong'));document.querySelectorAll('#quiz .qe').forEach(q=>q.textContent='');$('quizScore').innerHTML='';persist();};
+
+/* ---------- FIELDS, NAV, SAVE ---------- */
+let emb=null;try{emb=JSON.parse($('saved').textContent||'{}');if(!emb.fields)emb=null;}catch(e){}
+function collect(){const f={};document.querySelectorAll('[data-save]').forEach(el=>{f[el.id]=(el.type==='checkbox'||el.type==='radio')?el.checked:el.value;});return f;}
+function persist(){store.set('fields',collect());}
+(function(){const f=(emb&&emb.fields)||store.get('fields',null);if(f)for(const k in f){const el=$(k);if(!el||f[k]==null)continue;if(el.type==='checkbox'||el.type==='radio')el.checked=!!f[k];else el.value=f[k];}
+ document.querySelectorAll('#quiz textarea').forEach(t=>{if(t.value)t.style.display='block';});})();
+document.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.save!==undefined)persist();});
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.save!==undefined)persist();});
+function renderRadios(){document.querySelectorAll('#hypRadios button').forEach(b=>b.classList.toggle('on',b.dataset.v===$('hypRes').value));}
+document.querySelectorAll('#hypRadios button').forEach(b=>b.onclick=()=>{$('hypRes').value=b.dataset.v;persist();renderRadios();});
+function renderSelf(){const c=[...document.querySelectorAll('.selfcheck input')],n=c.filter(x=>x.checked).length;$('scBar').style.width=(n/c.length*100)+'%';$('scTxt').textContent=n+' / '+c.length+' тармақ орындалды';}
+document.querySelectorAll('.selfcheck input').forEach(x=>x.addEventListener('change',renderSelf));
+$('instList').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{e.target.closest('.ic').querySelector('.ph').innerHTML=`<img alt="" src="${r.result}">`;};r.readAsDataURL(f);});
+const SECT=[...document.querySelectorAll('section.card')];
+$('sidenav').innerHTML=SECT.map(s=>`<a href="#${s.id}" data-id="${s.id}"><b>${s.dataset.no}</b>${s.dataset.title}</a>`).join('');
+$('topnav').innerHTML=SECT.map(s=>`<a href="#${s.id}"><b>${s.dataset.no}</b> ${s.dataset.title}</a>`).join('');
+if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)document.querySelectorAll('#sidenav a').forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id));}),{rootMargin:'-30% 0px -60% 0px'});SECT.forEach(s=>io.observe(s));}
+let theme=store.get('theme','light');
+$('themeBtn').onclick=()=>{theme=theme==='dark'?'light':'dark';store.set('theme',theme);document.documentElement.setAttribute('data-theme',theme);};
+$('saveHtml').onclick=()=>{try{$('saved').textContent=JSON.stringify({fields:collect()}).replace(/</g,'\\u003c');
+ const clone=document.documentElement.cloneNode(true);clone.querySelectorAll('textarea').forEach(t=>{t.textContent=$(t.id)?$(t.id).value:t.value;});
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html'}));
+ const g=($('m-names').value||'').trim().replace(/[^\wА-Яа-яӘәҒғҚқҢңӨөҰұҮүҺһІі-]+/g,'_');a.download='Zertkhana_8'+(g?'_'+g:'')+'.html';
+ document.body.appendChild(a);a.click();a.remove();toast('Толтырылған HTML файлы жүктелді');}catch(e){toast('Сақтау мүмкін болмады');}};
+window.__lab={S,get F(){return F;}};
+/* ---------- INIT ---------- */
+document.documentElement.setAttribute('data-theme',theme);
+S.T=[F.cx,F.cy];goStep(1);renderRadios();renderSelf();applyA11y();
+requestAnimationFrame(loop);
+
+/* ---------- PHOTO LIGHTBOX ---------- */
+(function(){
+  const lb=$('lb'), st=$('lbStage'), im=$('lbImg');
+  let sc=1, fit=1, tx=0, ty=0; const MAX=8;
+  const apply=()=>{ im.style.transform=`translate(${tx}px,${ty}px) scale(${sc})`; $('lbPct').textContent=Math.round(sc/fit*100)+'%'; };
+  const clampPan=()=>{ const W=st.clientWidth,H=st.clientHeight,w=im.naturalWidth*sc,h=im.naturalHeight*sc;
+    const cx=(a,size,view)=> size<=view ? -size/2 : Math.min(-view/2, Math.max(view/2-size, a)); tx=cx(tx,w,W); ty=cx(ty,h,H); };
+  const reset=()=>{ fit=Math.min(st.clientWidth*0.95/im.naturalWidth, st.clientHeight*0.95/im.naturalHeight); sc=fit; tx=-im.naturalWidth*sc/2; ty=-im.naturalHeight*sc/2; apply(); };
+  const zoomAt=(f,px,py)=>{ const ns=Math.max(fit,Math.min(fit*MAX,sc*f)); const r=st.getBoundingClientRect();
+    const ox=(px??r.left+r.width/2)-r.left-r.width/2, oy=(py??r.top+r.height/2)-r.top-r.height/2;
+    tx=ox-(ox-tx)*ns/sc; ty=oy-(oy-ty)*ns/sc; sc=ns; clampPan(); apply(); };
+  const open=src=>{ im.onload=null; im.src=src.src; im.alt=src.alt; lb.hidden=false; document.body.style.overflow='hidden'; if(im.complete&&im.naturalWidth) reset(); else im.onload=reset; };
+  const close=()=>{ lb.hidden=true; document.body.style.overflow=''; };
+  document.querySelectorAll('img.zoomable').forEach(i=>i.addEventListener('click',()=>open(i)));
+  $('lbClose').onclick=close; $('lbIn').onclick=()=>zoomAt(1.4); $('lbOut').onclick=()=>zoomAt(1/1.4); $('lbFit').onclick=reset;
+  document.addEventListener('keydown',e=>{ if(lb.hidden) return; if(e.key==='Escape') close(); if(e.key==='+'||e.key==='=') zoomAt(1.25); if(e.key==='-') zoomAt(0.8); });
+  st.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(e.deltaY<0?1.15:1/1.15,e.clientX,e.clientY); },{passive:false});
+  st.addEventListener('dblclick',e=>{ if(sc>fit*1.05) reset(); else zoomAt(3,e.clientX,e.clientY); });
+  const P=new Map(); let last=null, pinch=null, moved=0;
+  st.addEventListener('pointerdown',e=>{ st.setPointerCapture(e.pointerId); P.set(e.pointerId,{x:e.clientX,y:e.clientY}); st.classList.add('drag'); if(P.size===1) moved=0;
+    if(P.size===2){ const [a,b]=[...P.values()]; pinch={d:Math.hypot(a.x-b.x,a.y-b.y)}; } last={x:e.clientX,y:e.clientY}; });
+  st.addEventListener('pointermove',e=>{ if(!P.has(e.pointerId)) return; P.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(P.size===2&&pinch){ moved=99; const [a,b]=[...P.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); zoomAt(d/pinch.d,(a.x+b.x)/2,(a.y+b.y)/2); pinch.d=d; return; }
+    if(P.size===1&&last){ moved+=Math.abs(e.clientX-last.x)+Math.abs(e.clientY-last.y); tx+=e.clientX-last.x; ty+=e.clientY-last.y; last={x:e.clientX,y:e.clientY}; clampPan(); apply(); } });
+  const up=e=>{ P.delete(e.pointerId); if(P.size<2) pinch=null; if(!P.size){ st.classList.remove('drag'); last=null; } else { const v=[...P.values()][0]; last={x:v.x,y:v.y}; } };
+  st.addEventListener('pointerup',up); st.addEventListener('pointercancel',up);
+  st.addEventListener('click',e=>{ if(e.target===st&&moved<5) close(); });
+  window.addEventListener('resize',()=>{ if(!lb.hidden) reset(); });
+})();
+})();
+</script>
+</body>
+</html>
